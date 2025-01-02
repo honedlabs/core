@@ -44,19 +44,26 @@ trait HasSuffix
     /**
      * Get the suffix.
      *
-     * @param  mixed  $parameter
+     * @param  array<string, mixed>  $named
+     * @param  array<string, mixed>  $typed
      */
-    public function getSuffix($parameter = null): ?string
+    public function getSuffix(array $named = [], array $typed = []): ?string
     {
-        return value($this->suffix, $parameter);
+        return $this->evaluate($this->suffix, $named, $typed);
     }
 
     /**
-     * Determine if the class does not have a suffix.
+     * Resolve the suffix using the given closure dependencies.
+     *
+     * @param  array<string, mixed>  $named
+     * @param  array<string, mixed>  $typed
      */
-    public function missingSuffix(): bool
+    public function resolveSuffix(array $named = [], array $typed = []): ?string
     {
-        return \is_null($this->suffix);
+        $suffix = $this->getSuffix($named, $typed);
+        $this->setSuffix($suffix);
+
+        return $suffix;
     }
 
     /**
@@ -64,6 +71,6 @@ trait HasSuffix
      */
     public function hasSuffix(): bool
     {
-        return ! $this->missingSuffix();
+        return ! \is_null($this->suffix);
     }
 }

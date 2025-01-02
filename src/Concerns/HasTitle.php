@@ -65,18 +65,10 @@ trait HasTitle
     }
 
     /**
-     * Determine if the class does not have a title.
-     */
-    public function missingTitle(): bool
-    {
-        return \is_null($this->title);
-    }
-
-    /**
      * Determine if the class has a title.
      */
     public function hasTitle(): bool
     {
-        return ! $this->missingTitle();
+        return ! \is_null($this->title);
     }
 }

@@ -9,43 +9,44 @@ trait Validatable
     /**
      * @var (\Closure(mixed):bool)|null
      */
-    protected $validate = null;
+    protected $validator = null;
 
     /**
      * Set the validation function, chainable.
      *
-     * @param  (\Closure(mixed):bool)  $validate
+     * @param  (\Closure(mixed):bool)  $validator
      * @return $this
      */
-    public function validate(\Closure $validate): static
+    public function validator(\Closure $validator): static
     {
-        $this->setValidate($validate);
+        $this->setValidator($validator);
 
         return $this;
     }
 
     /**
-     * Alias for validate
+     * Alias for `validator`.
      *
-     * @param  (\Closure(mixed):bool)  $validate
+     * @param  (\Closure(mixed):bool)  $validator
      * @return $this
      */
-    public function validateUsing(\Closure $validate): static
+    public function validateUsing(\Closure $validator): static
     {
-        return $this->validate($validate);
+        return $this->validator($validator);
     }
 
     /**
      * Set the validation function quietly.
      *
-     * @param  (\Closure(mixed):bool)|null  $validate
+     * @param  (\Closure(mixed):bool)|null  $validator
      */
-    public function setValidate(?\Closure $validate): void
+    public function setValidator(?\Closure $validator): void
     {
-        if (is_null($validate)) {
+        if (\is_null($validator)) {
             return;
         }
-        $this->validate = $validate;
+
+        $this->validator = $validator;
     }
 
     /**
@@ -53,15 +54,7 @@ trait Validatable
      */
     public function canValidate(): bool
     {
-        return ! is_null($this->validate);
-    }
-
-    /**
-     * Determine if the class cannot validate.
-     */
-    public function cannotValidate(): bool
-    {
-        return ! $this->canValidate();
+        return ! \is_null($this->validator);
     }
 
     /**
@@ -69,29 +62,24 @@ trait Validatable
      *
      * @return (\Closure(mixed):bool)|null
      */
-    public function getValidate(): ?\Closure
+    public function getValidator(): ?\Closure
     {
-        return $this->validate;
+        return $this->validator;
     }
 
     /**
      * Apply the validation function to a given value.
-     * If no validation function is set, validation is considered successful.
      */
-    public function applyValidation(mixed $value): bool
+    public function validate(mixed $value): bool
     {
-        if ($this->cannotValidate()) {
-            return true;
-        }
-
-        return $this->isValid($value);
+        return $this->canValidate() ? \call_user_func($this->getValidator(), $value) : true;
     }
 
     /**
-     * Alias for applyValidation
+     * Alias for `validate`.
      */
     public function isValid(mixed $value): bool
     {
-        return (bool) ($this->getValidate())($value);
+        return $this->validate($value);
     }
 }

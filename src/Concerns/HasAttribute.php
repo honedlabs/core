@@ -34,7 +34,7 @@ trait HasAttribute
      */
     public function setAttribute(string|\Closure|null $attribute): void
     {
-        if (is_null($attribute)) {
+        if (\is_null($attribute)) {
             return;
         }
         $this->attribute = $attribute;
@@ -65,18 +65,10 @@ trait HasAttribute
     }
 
     /**
-     * Determine if the class does not have a attribute.
-     */
-    public function missingAttribute(): bool
-    {
-        return \is_null($this->attribute);
-    }
-
-    /**
      * Determine if the class has a attribute.
      */
     public function hasAttribute(): bool
     {
-        return ! $this->missingAttribute();
+        return ! \is_null($this->attribute);
     }
 }

@@ -14,16 +14,12 @@ trait IsAnonymous
      */
     public function isAnonymous(): bool
     {
+        if (! \property_exists($this, 'anonymous')) {
+            return false;
+        }
+
         $reflection = new \ReflectionClass($this);
 
         return $reflection->getName() === $this->anonymous;
-    }
-
-    /**
-     * Determine if the class is not anonymous.
-     */
-    public function isNotAnonymous(): bool
-    {
-        return ! $this->isAnonymous();
     }
 }

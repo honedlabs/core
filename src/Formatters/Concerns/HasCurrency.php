@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+/**
+ * @mixin \Honed\Core\Concerns\Evaluable
+ */
+
 namespace Honed\Core\Formatters\Concerns;
 
 trait HasCurrency
@@ -39,21 +43,28 @@ trait HasCurrency
     }
 
     /**
-     * Get the currency.
+     * Get the currency using the given closure dependencies.
      *
-     * @param  mixed  $parameter
+     * @param  array<string, mixed>  $named
+     * @param  array<string, mixed>  $typed
      */
-    public function getCurrency($parameter = null): ?string
+    public function getCurrency(array $named = [], array $typed = []): ?string
     {
-        return value($this->currency, $parameter);
+        return $this->evaluate($this->currency, $named, $typed);
     }
 
     /**
-     * Determine if the class does not have a currency.
+     * Resolve the currency using the given closure dependencies.
+     *
+     * @param  array<string, mixed>  $named
+     * @param  array<string, mixed>  $typed
      */
-    public function missingCurrency(): bool
+    public function resolveCurrency(array $named = [], array $typed = []): ?string
     {
-        return \is_null($this->currency);
+        $currency = $this->getCurrency($named, $typed);
+        $this->setCurrency($currency);
+
+        return $currency;
     }
 
     /**
@@ -61,6 +72,6 @@ trait HasCurrency
      */
     public function hasCurrency(): bool
     {
-        return ! $this->missingCurrency();
+        return ! \is_null($this->currency);
     }
 }

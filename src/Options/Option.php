@@ -18,22 +18,18 @@ class Option extends Primitive
     use IsActive;
 
     /**
-     * @param  int|string|array<array-key,mixed>|\Closure():int|string|array<array-key,mixed>  $value
-     * @param  string|(\Closure():string)|null  $label
+     * Create a new Option instance.
      */
-    final public function __construct(mixed $value, $label = null)
+    final public function __construct(int|string|float|bool|null $value, string|\Closure|null $label = null)
     {
         $this->setValue($value);
-        $this->setLabel($label ?? $this->makeLabel($value));
+        $this->setLabel($label ?? $this->makeLabel((string) $value));
     }
 
     /**
-     * Create an option class
-     *
-     * @param  int|string|array<array-key,mixed>|\Closure():int|string|array<array-key,mixed>  $value
-     * @param  string|(\Closure():string)|null  $label
+     * Make a new option class.
      */
-    public static function make($value, $label = null): static
+    public static function make(int|string|float|bool|null $value, ?string $label = null): static
     {
         return resolve(static::class, compact('value', 'label'));
     }

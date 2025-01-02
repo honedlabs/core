@@ -4,23 +4,19 @@ declare(strict_types=1);
 
 namespace Honed\Core\Concerns;
 
-/**
- * @mixin \Honed\Core\Concerns\Evaluable
- */
 trait HasAlias
 {
     /**
-     * @var string|(\Closure():string)|null
+     * @var string|null
      */
     protected $alias = null;
 
     /**
      * Set the alias, chainable.
      *
-     * @param  string|\Closure():string  $alias
      * @return $this
      */
-    public function alias(string|\Closure $alias): static
+    public function alias(string $alias): static
     {
         $this->setAlias($alias);
 
@@ -29,14 +25,13 @@ trait HasAlias
 
     /**
      * Set the alias quietly.
-     *
-     * @param  string|(\Closure():string)|null  $alias
      */
-    public function setAlias(string|\Closure|null $alias): void
+    public function setAlias(?string $alias): void
     {
-        if (is_null($alias)) {
+        if (\is_null($alias)) {
             return;
         }
+
         $this->alias = $alias;
     }
 
@@ -45,15 +40,7 @@ trait HasAlias
      */
     public function getAlias(): ?string
     {
-        return $this->evaluate($this->alias);
-    }
-
-    /**
-     * Determine if the class does not have a alias.
-     */
-    public function missingAlias(): bool
-    {
-        return \is_null($this->alias);
+        return $this->alias;
     }
 
     /**
@@ -61,6 +48,6 @@ trait HasAlias
      */
     public function hasAlias(): bool
     {
-        return ! $this->missingAlias();
+        return ! \is_null($this->alias);
     }
 }

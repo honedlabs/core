@@ -4,20 +4,21 @@ declare(strict_types=1);
 
 namespace Honed\Core\Concerns;
 
+use Honed\Core\Contracts\Icon;
+
 trait HasIcon
 {
     /**
-     * @var string|\Closure():string|null
+     * @var string|Icon|null
      */
     protected $icon;
 
     /**
      * Set the icon, chainable.
      *
-     * @param  string|\Closure():string|null  $icon
      * @return $this
      */
-    public function icon(string|\Closure $icon): static
+    public function icon(string|Icon $icon): static
     {
         $this->setIcon($icon);
 
@@ -26,11 +27,13 @@ trait HasIcon
 
     /**
      * Set the icon, quietly.
-     *
-     * @param  string|\Closure():string|null  $icon
      */
-    public function setIcon(string|\Closure|null $icon): void
+    public function setIcon(string|Icon|null $icon): void
     {
+        if (\is_null($icon)) {
+            return;
+        }
+
         $this->icon = $icon;
     }
 
@@ -47,6 +50,6 @@ trait HasIcon
      */
     public function getIcon(): ?string
     {
-        return value($this->icon);
+        return $this->icon instanceof Icon ? $this->icon->icon() : $this->icon;
     }
 }

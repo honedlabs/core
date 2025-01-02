@@ -28,7 +28,7 @@ trait Authorizable
     }
 
     /**
-     * Alias for authorize
+     * Alias for `authorize`.
      *
      * @param  bool|\Closure(mixed...):bool  $condition
      * @return $this
@@ -41,22 +41,19 @@ trait Authorizable
     /**
      * Set the condition for authorization quietly.
      *
-     * @param  bool|\Closure(mixed...):bool|null  $condition
+     * @param  bool|\Closure(mixed...):bool  $condition
      */
-    public function setAuthorize(bool|\Closure|null $condition): void
+    public function setAuthorize(bool|\Closure $condition): void
     {
-        if (is_null($condition)) {
-            return;
-        }
         $this->authorized = $condition;
     }
 
     /**
-     * Alias for setAuthorize
+     * Alias for `setAuthorize`.
      *
-     * @param  bool|\Closure(mixed...):bool|null  $condition
+     * @param  bool|\Closure(mixed...):bool  $condition
      */
-    public function setAuthorise(bool|\Closure|null $condition): void
+    public function setAuthorise(bool|\Closure $condition): void
     {
         $this->setAuthorize($condition);
     }
@@ -73,18 +70,7 @@ trait Authorizable
     }
 
     /**
-     * Determine if the class is not authorized using the given closure dependencies.
-     *
-     * @param  array<string, mixed>  $named
-     * @param  array<string, mixed>  $typed
-     */
-    public function isNotAuthorized(array $named = [], array $typed = []): bool
-    {
-        return ! $this->isAuthorized($named, $typed);
-    }
-
-    /**
-     * Alias for isAuthorized
+     * Alias for `isAuthorized`.
      *
      * @param  array<string, mixed>  $named
      * @param  array<string, mixed>  $typed
@@ -95,13 +81,27 @@ trait Authorizable
     }
 
     /**
-     * Alias for isNotAuthorized
+     * Resolve the authorization using the given closure dependencies.
      *
      * @param  array<string, mixed>  $named
      * @param  array<string, mixed>  $typed
      */
-    public function isNotAuthorised(array $named = [], array $typed = []): bool
+    public function resolveAuthorization(array $named = [], array $typed = []): bool
     {
-        return $this->isNotAuthorized($named, $typed);
+        $authorized = $this->isAuthorized($named, $typed);
+        $this->setAuthorize($authorized);
+
+        return $authorized;
+    }
+
+    /**
+     * Alias for `resolveAuthorization`.
+     *
+     * @param  array<string, mixed>  $named
+     * @param  array<string, mixed>  $typed
+     */
+    public function resolveAuthorisation(array $named = [], array $typed = []): bool
+    {
+        return $this->resolveAuthorization($named, $typed);
     }
 }

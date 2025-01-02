@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Honed\Core\Concerns;
 
+use Illuminate\Support\Stringable;
+
 /**
  * @mixin \Honed\Core\Concerns\Evaluable
  */
@@ -34,9 +36,10 @@ trait HasName
      */
     public function setName(string|\Closure|null $name): void
     {
-        if (is_null($name)) {
+        if (\is_null($name)) {
             return;
         }
+
         $this->name = $name;
     }
 
@@ -59,17 +62,10 @@ trait HasName
      */
     public function resolveName(array $named = [], array $typed = []): ?string
     {
-        $this->setName($this->getName($named, $typed));
+        $name = $this->getName($named, $typed);
+        $this->setName($name);
 
-        return $this->name;
-    }
-
-    /**
-     * Determine if the class does not have a name.
-     */
-    public function missingName(): bool
-    {
-        return \is_null($this->name);
+        return $name;
     }
 
     /**
@@ -77,7 +73,7 @@ trait HasName
      */
     public function hasName(): bool
     {
-        return ! $this->missingName();
+        return ! \is_null($this->name);
     }
 
     /**
@@ -85,8 +81,11 @@ trait HasName
      *
      * @param  string|\Stringable|(\Closure():string|\Stringable)  $label
      */
-    public function makeName(string|\Stringable|\Closure $label): string
+    public function makeName(string $label): string
     {
-        return str($this->evaluate($label))->snake()->lower()->toString();
+        return (new Stringable($label))
+            ->snake()
+            ->lower()
+            ->value();
     }
 }

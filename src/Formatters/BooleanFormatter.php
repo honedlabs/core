@@ -11,39 +11,30 @@ class BooleanFormatter implements Contracts\Formatter
 
     /**
      * Create a new boolean formatter instance with a truth label and false label.
-     *
-     * @param  string|(\Closure():string)|null  $truthLabel
-     * @param  string|(\Closure():string)|null  $falseLabel
      */
-    public function __construct(string|\Closure|null $truthLabel = null, string|\Closure|null $falseLabel = null)
+    public function __construct(?string $truth = null, ?string $false = null)
     {
-        $this->setTruthLabel($truthLabel);
-        $this->setFalseLabel($falseLabel);
+        $this->setTruthLabel($truth);
+        $this->setFalseLabel($false);
     }
 
     /**
      * Make a boolean formatter with a truth label and false label.
-     *
-     * @param  string|(\Closure():string)|null  $truthLabel
-     * @param  string|(\Closure():string)|null  $falseLabel
-     * @return $this
      */
-    public static function make(string|\Closure|null $truthLabel = null, string|\Closure|null $falseLabel = null): static
+    public static function make(?string $truth = null, ?string $false = null): static
     {
-        return resolve(static::class, compact('truthLabel', 'falseLabel'));
+        return resolve(static::class, compact('truth', 'false'));
     }
 
     /**
      * Set the truth and false labels, chainable.
      *
-     * @param  string|(\Closure():string)|null  $truthLabel
-     * @param  string|(\Closure():string)|null  $falseLabel
      * @return $this
      */
-    public function labels(string|\Closure|null $truthLabel = null, string|\Closure|null $falseLabel = null): static
+    public function labels(?string $truth = null, ?string $false = null): static
     {
-        $this->setTruthLabel($truthLabel);
-        $this->setFalseLabel($falseLabel);
+        $this->setTruthLabel($truth);
+        $this->setFalseLabel($false);
 
         return $this;
     }
@@ -53,6 +44,6 @@ class BooleanFormatter implements Contracts\Formatter
      */
     public function format(mixed $value): string
     {
-        return (bool) $value ? $this->getTruthLabel() : $this->getFalseLabel();
+        return ((bool) $value) ? $this->getTruthLabel() : $this->getFalseLabel();
     }
 }

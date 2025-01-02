@@ -8,31 +8,28 @@ use Honed\Core\Options\Option;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
-/**
- * Specify whether this class contains options
- *
- * @property array<Option> $options
- */
 trait HasOptions
 {
     /**
-     * @var array<int, Option>
+     * @var array<int,\Honed\Core\Options\Option>
      */
     protected $options = [];
 
     /**
      * Set the options, chainable
      *
-     * @param  array<int,mixed>|\Illuminate\Support\Collection|class-string<\BackedEnum>|class-string<\Illuminate\Database\Eloquent\Model>  $options
+     * @param  array<int,mixed>|\Illuminate\Support\Collection|class-string<\BackedEnum>|class-string<\Illuminate\Database\Eloquent\Model>|\Honed\Core\Options\Option  $option
+     * @param  array<int,\Honed\Core\Options\Option>  $options
      * @return $this
      */
-    public function options(array|Collection|string $options): static
+    public function options(array|string|Collection|Option $option, ...$options): static
     {
         match (true) {
-            $options instanceof Collection => $this->fromCollection($options),
-            \is_string($options) && \enum_exists($options) => $this->fromEnum($options),
-            \is_string($options) => $this->fromModel($options), // if string, assume model
-            default => $this->setOptions($options), // array
+            $option instanceof Collection => $this->fromCollection($option),
+            $option instanceof Option => $this->setOptions([$option, ...$options]),
+            \is_string($option) && \enum_exists($option) => $this->fromEnum($option),
+            \is_string($option) => $this->fromModel($option),
+            default => $this->setOptions($option),
         };
 
         return $this;
@@ -47,11 +44,12 @@ trait HasOptions
      */
     public function fromEnum(string $enum, ?string $value = null, ?string $label = null): static
     {
-        foreach ($enum::cases() as $case) {
-            $optionValue = ($value && method_exists($case, $value)) ? $case->{$value}() : $case->value;
-            $optionLabel = ($label && method_exists($case, $label)) ? $case->{$label}() : $case->name;
-            $this->addOption($this->parseOption($optionValue, $optionLabel));
-        }
+        collect($enum::cases())->each(function ($case) use ($value, $label) {
+            $this->addOption($this->parseOption(
+                $this->getOptionField($case, $value) ?? $case->value,
+                $this->getOptionField($case, $label) ?? $case->name
+            ));
+        });
 
         return $this;
     }
@@ -65,11 +63,12 @@ trait HasOptions
      */
     public function fromModel(string $model, ?string $value = null, ?string $label = null): static
     {
-        foreach ($model::all() as $modelInstance) {
-            $optionValue = $this->getOptionField($modelInstance, $value) ?? $modelInstance->getKey();
-            $optionLabel = $label !== null ? $this->getOptionField($modelInstance, $label) : null;
-            $this->addOption($this->parseOption($optionValue, $optionLabel));
-        }
+        collect($model::all())->each(function ($instance) use ($value, $label) {
+            $this->addOption($this->parseOption(
+                $this->getOptionField($instance, $value) ?? $instance->getKey(),
+                $this->getOptionField($instance, $label)
+            ));
+        });
 
         return $this;
     }
@@ -83,9 +82,13 @@ trait HasOptions
     public function fromCollection(Collection $collection, ?string $value = null, ?string $label = null): static
     {
         $collection->each(function ($item) use ($value, $label) {
-            $optionValue = $this->getOptionField($item, $value) ?? $item;
-            $optionLabel = $label !== null ? $this->getOptionField($item, $label) : null;
-            $this->addOption($this->parseOption($optionValue, $optionLabel));
+            $this->addOption($item instanceof Option
+                ? $item
+                : $this->parseOption(
+                    $this->getOptionField($item, $value) ?? $item,
+                    $this->getOptionField($item, $label)
+                )
+            );
         });
 
         return $this;
@@ -94,24 +97,21 @@ trait HasOptions
     /**
      * Set the options quietly.
      *
-     * @param  array<Option>|null  $options
+     * @param  array<\Honed\Core\Options\Option>|null  $options
      */
     public function setOptions(?array $options): void
     {
-        if (is_null($options)) {
+        if (\is_null($options)) {
             return;
         }
 
-        foreach ($options as $value => $label) {
-            if ($label instanceof Option) {
-                $option = $label;
-            } elseif (is_int($value)) {
-                $option = $this->parseOption($label);
-            } else {
-                $option = $this->parseOption($value, $label);
-            }
-            $this->addOption($option);
-        }
+        collect($options)->each(function ($value, $key) {
+            $this->addOption(match (true) {
+                $value instanceof Option => $value,
+                \is_int($key) => $this->parseOption($value),
+                default => $this->parseOption($key, $value),
+            });
+        });
     }
 
     /**
@@ -125,7 +125,7 @@ trait HasOptions
     /**
      * Get the options
      *
-     * @return array<Option>
+     * @return array<int,\Honed\Core\Options\Option>
      */
     public function getOptions(): array
     {
@@ -133,11 +133,13 @@ trait HasOptions
     }
 
     /**
-     * Determine if the class is missing options.
+     * Get the options as a collection.
+     *
+     * @return \Illuminate\Support\Collection<int,\Honed\Core\Options\Option>
      */
-    public function missingOptions(): bool
+    public function collectOptions(): Collection
     {
-        return empty($this->options);
+        return collect($this->options);
     }
 
     /**
@@ -145,45 +147,32 @@ trait HasOptions
      */
     public function hasOptions(): bool
     {
-        return ! $this->missingOptions();
+        return \count($this->options) > 0;
     }
 
     /**
      * Get an option field from an item.
      *
-     * @param  array|object  $item
+     * @internal
      */
-    protected function getOptionField(mixed $item, ?string $key): mixed
+    protected function getOptionField(mixed $item, ?string $key = null): mixed
     {
-        if ($key === null) {
-            return null;
-        }
 
-        if (is_array($item)) {
-            return $item[$key] ?? null;
-        }
-
-        if (is_object($item)) {
-            if (method_exists($item, $key)) {
-                return $item->{$key}();
-            }
-
-            if (property_exists($item, $key)) {
-                return $item->{$key};
-            }
-
-            if (method_exists($item, 'getAttribute')) {
-                return $item->getAttribute($key);
-            }
-        }
-
-        return null;
+        return match (true) {
+            \is_null($key) => null,
+            $item instanceof Model => $item->getAttribute($key),
+            \is_array($item) => $item[$key] ?? null,
+            ! \is_object($item) => null,
+            \method_exists($item, $key) => $item->{$key}(),
+            \property_exists($item, $key) => $item->{$key},
+            default => null,
+        };
     }
 
     /**
      * Parse a value and label as an Option class.
      *
-     * @param  int|string|array|(\Closure():int|string|array)|null  $value
+     * @internal
      */
     protected function parseOption(mixed $value, ?string $label = null): Option
     {

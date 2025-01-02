@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Honed\Core\Concerns;
 
+use Illuminate\Support\Stringable;
+
 /**
  * @mixin \Honed\Core\Concerns\Evaluable
  */
@@ -34,9 +36,10 @@ trait HasLabel
      */
     public function setLabel(string|\Closure|null $label): void
     {
-        if (is_null($label)) {
+        if (\is_null($label)) {
             return;
         }
+
         $this->label = $label;
     }
 
@@ -59,17 +62,10 @@ trait HasLabel
      */
     public function resolveLabel(array $named = [], array $typed = []): ?string
     {
-        $this->setLabel($this->getLabel($named, $typed));
+        $label = $this->getLabel($named, $typed);
+        $this->setLabel($label);
 
-        return $this->label;
-    }
-
-    /**
-     * Determine if the class does not have a label.
-     */
-    public function missingLabel(): bool
-    {
-        return \is_null($this->label);
+        return $label;
     }
 
     /**
@@ -77,14 +73,20 @@ trait HasLabel
      */
     public function hasLabel(): bool
     {
-        return ! $this->missingLabel();
+        return ! \is_null($this->label);
     }
 
     /**
      * Convert a string to the label format.
+     *
+     * @param  string|\Closure():string  $name
      */
-    public function makeLabel(mixed $name): string
+    public function makeLabel(string|\Closure $name): string
     {
-        return str((string) $this->evaluate($name))->headline()->lower()->ucfirst()->toString();
+        return (new Stringable($this->evaluate($name)))
+            ->headline()
+            ->lower()
+            ->ucfirst()
+            ->value();
     }
 }

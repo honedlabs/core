@@ -7,17 +7,16 @@ namespace Honed\Core\Formatters\Concerns;
 trait Truncates
 {
     /**
-     * @var int|(\Closure():int)|null
+     * @var int|null
      */
     protected $truncate = null;
 
     /**
      * Set the truncate amount, chainable.
      *
-     * @param  int|(\Closure():int)  $truncate
      * @return $this
      */
-    public function truncate(int|\Closure $truncate): static
+    public function truncate(int $truncate): static
     {
         $this->setTruncate($truncate);
 
@@ -26,10 +25,8 @@ trait Truncates
 
     /**
      * Set the truncate amount quietly.
-     *
-     * @param  int|(\Closure():int)|null  $truncate
      */
-    public function setTruncate(int|\Closure|null $truncate): void
+    public function setTruncate(?int $truncate): void
     {
         if (\is_null($truncate)) {
             return;
@@ -43,15 +40,7 @@ trait Truncates
      */
     public function getTruncate(): ?int
     {
-        return value($this->truncate);
-    }
-
-    /**
-     * Determine if the class does not have a truncate amount.
-     */
-    public function missingTruncate(): bool
-    {
-        return \is_null($this->truncate);
+        return $this->truncate;
     }
 
     /**
@@ -59,6 +48,6 @@ trait Truncates
      */
     public function hasTruncate(): bool
     {
-        return ! $this->missingTruncate();
+        return ! \is_null($this->truncate);
     }
 }

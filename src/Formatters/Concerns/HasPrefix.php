@@ -41,19 +41,26 @@ trait HasPrefix
     /**
      * Get the prefix.
      *
-     * @param  mixed  $parameter
+     * @param  array<string, mixed>  $named
+     * @param  array<string, mixed>  $typed
      */
-    public function getPrefix($parameter = null): ?string
+    public function getPrefix(array $named = [], array $typed = []): ?string
     {
-        return value($this->prefix, $parameter);
+        return $this->evaluate($this->prefix, $named, $typed);
     }
 
     /**
-     * Determine if the class does not have a prefix.
+     * Resolve the prefix using the given closure dependencies.
+     *
+     * @param  array<string, mixed>  $named
+     * @param  array<string, mixed>  $typed
      */
-    public function missingPrefix(): bool
+    public function resolvePrefix(array $named = [], array $typed = []): ?string
     {
-        return \is_null($this->prefix);
+        $prefix = $this->getPrefix($named, $typed);
+        $this->setPrefix($prefix);
+
+        return $prefix;
     }
 
     /**
@@ -61,6 +68,6 @@ trait HasPrefix
      */
     public function hasPrefix(): bool
     {
-        return ! $this->missingPrefix();
+        return ! \is_null($this->prefix);
     }
 }
