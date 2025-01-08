@@ -9,15 +9,14 @@ use Honed\Core\Concerns\HasName;
 
 class EvaluableDependencyTest
 {
-    use HasName;
-    use HasDescription;
     use Evaluable;
     use EvaluableDependency;
+    use HasDescription;
+    use HasName;
 }
 
 beforeEach(function () {
     $this->test = new EvaluableDependencyTest;
 });
 
-it('evaluates', function () {
-})->todo();
+it('evaluates', function () {})->todo();

@@ -13,8 +13,8 @@ trait HasAlias
 
     /**
      * Get or set the alias for the instance.
-     * 
-     * @param string|null $alias The alias to set, or null to retrieve the current alias.
+     *
+     * @param  string|null  $alias  The alias to set, or null to retrieve the current alias.
      * @return $this|string The current alias when no argument is provided, or the instance when setting the alias.
      */
     public function alias($alias = null)
@@ -30,7 +30,7 @@ trait HasAlias
 
     /**
      * Determine if the instance has an alias set.
-     * 
+     *
      * @return bool True if an alias is set, false otherwise.
      */
     public function hasAlias()

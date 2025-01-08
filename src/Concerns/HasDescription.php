@@ -17,8 +17,8 @@ trait HasDescription
 
     /**
      * Get or set the description for the instance.
-     * 
-     * @param string|\Closure|null $description The description to set, or null to retrieve the current description.
+     *
+     * @param  string|\Closure|null  $description  The description to set, or null to retrieve the current description.
      * @return $this|string The current description when no argument is provided, or the instance when setting the description.
      */
     public function description($description = null)
@@ -34,7 +34,7 @@ trait HasDescription
 
     /**
      * Determine if the instance has an description set.
-     * 
+     *
      * @return bool True if an description is set, false otherwise.
      */
     public function hasDescription()
@@ -44,9 +44,9 @@ trait HasDescription
 
     /**
      * Evaluate the description using injected named and typed parameters, or from a model.
-     * 
-     * @param array<string,mixed>|\Illuminate\Database\Eloquent\Model $namedOrModel The named parameters to inject into the description, or the model to evaluate the description from.
-     * @param array<string,mixed> $typed The typed parameters to inject into the description, if provided.
+     *
+     * @param  array<string,mixed>|\Illuminate\Database\Eloquent\Model  $namedOrModel  The named parameters to inject into the description, or the model to evaluate the description from.
+     * @param  array<string,mixed>  $typed  The typed parameters to inject into the description, if provided.
      * @return string The evaluated description.
      */
     public function evaluateDescription($namedOrModel = [], $typed = [])
@@ -63,8 +63,8 @@ trait HasDescription
 
     /**
      * Evaluate the description from a model.
-     * 
-     * @param \Illuminate\Database\Eloquent\Model $model The model to evaluate the description from.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model  The model to evaluate the description from.
      * @return string The evaluated description.
      */
     private function evaluateDescriptionFromModel($model)
@@ -72,4 +72,3 @@ trait HasDescription
         return $this->hasDescriptionEvaluatesModel($model, 'evaluateDescription');
     }
 }
-

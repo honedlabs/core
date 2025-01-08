@@ -67,5 +67,3 @@ describe('allows model', function () {
             ->allowsModel($this->product)->toBeFalse();
     });
 });
-
-

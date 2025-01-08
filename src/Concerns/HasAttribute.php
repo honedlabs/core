@@ -13,8 +13,8 @@ trait HasAttribute
 
     /**
      * Get or set the attribute for the instance.
-     * 
-     * @param string|null $attribute The attribute to set, or null to retrieve the current attribute.
+     *
+     * @param  string|null  $attribute  The attribute to set, or null to retrieve the current attribute.
      * @return $this|string The current attribute when no argument is provided, or the instance when setting the attribute.
      */
     public function attribute($attribute = null)
@@ -30,7 +30,7 @@ trait HasAttribute
 
     /**
      * Determine if the instance has an attribute set.
-     * 
+     *
      * @return bool True if an attribute is set, false otherwise.
      */
     public function hasAttribute()
