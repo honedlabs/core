@@ -52,8 +52,8 @@ it('sets destination closure', function () {
     ))->toBeInstanceOf(DestinationTest::class)
         ->hasDestination()->toBeTrue()
         ->getDestination()->scoped(fn ($destination) => $destination
-    ->goesTo()->toBe('product.show')
-    ->getParameters()->toBe($this->product)
+        ->goesTo()->toBe('product.show')
+        ->getParameters()->toBe($this->product)
         )->resolveDestination($this->product)->toBe(route('product.show', $this->product));
 });
 
