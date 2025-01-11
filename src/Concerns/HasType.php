@@ -7,35 +7,26 @@ namespace Honed\Core\Concerns;
 trait HasType
 {
     /**
-     * @var string|null
+     * @var string
      */
-    protected $type = null;
+    protected $type;
 
     /**
-     * Set the type property, chainable
+     * Set the type for the instance.
      *
      * @return $this
      */
-    public function type(string $type): static
+    public function type(?string $type): static
     {
-        $this->setType($type);
+        if (! \is_null($type)) {
+            $this->type = $type;
+        }
 
         return $this;
     }
 
     /**
-     * Set the type property quietly.
-     */
-    public function setType(?string $type): void
-    {
-        if (\is_null($type)) {
-            return;
-        }
-        $this->type = $type;
-    }
-
-    /**
-     * Get the type using the given closure dependencies.
+     * Get the type for the instance.
      */
     public function getType(): ?string
     {
@@ -43,10 +34,10 @@ trait HasType
     }
 
     /**
-     * Determine if the class has a type.
+     * Determine if the instance has an type set.
      */
     public function hasType(): bool
     {
-        return ! \is_null($this->type);
+        return isset($this->type);
     }
 }

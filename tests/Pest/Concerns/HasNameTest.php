@@ -1,52 +1,48 @@
 <?php
 
+declare(strict_types=1);
+
 use Honed\Core\Concerns\Evaluable;
 use Honed\Core\Concerns\HasName;
+use Honed\Core\Tests\Stubs\Product;
 
-class HasNameComponent
+class NameTest
 {
     use Evaluable;
     use HasName;
 }
 
 beforeEach(function () {
-    $this->component = new HasNameComponent;
+    $this->test = new NameTest;
 });
 
-it('has no name by default', function () {
-    expect($this->component)
-        ->getName()->toBeNull()
-        ->hasName()->toBeFalse();
-});
-
-it('sets name', function () {
-    $this->component->setName('Name');
-    expect($this->component)
-        ->getName()->toBe('Name')
+it('sets', function () {
+    expect($this->test->name('test'))
+        ->toBeInstanceOf(NameTest::class)
         ->hasName()->toBeTrue();
 });
 
-it('rejects null values', function () {
-    $this->component->setName('Name');
-    $this->component->setName(null);
-    expect($this->component)
-        ->getName()->toBe('Name')
+it('gets', function () {
+    expect($this->test->name('test'))
+        ->getName()->toBe('test')
         ->hasName()->toBeTrue();
 });
 
-it('chains name', function () {
-    expect($this->component->name('Name'))->toBeInstanceOf(HasNameComponent::class)
-        ->getName()->toBe('Name')
+it('evaluates', function () {
+    $product = product();
+
+    expect($this->test->name(fn (Product $product) => $product->name))
+        ->getName(['product' => $product])->toBe($product->name)
         ->hasName()->toBeTrue();
 });
 
-it('resolves name', function () {
-    expect($this->component->name(fn ($record) => $record.'.'))
-        ->toBeInstanceOf(HasNameComponent::class)
-        ->resolveName(['record' => 'Name'])->toBe('Name.')
-        ->getName()->toBe('Name.');
+it('evaluates model', function () {
+    $product = product();
+    expect($this->test->name(fn (Product $product) => $product->name))
+        ->getName($product)->toBe($product->name)
+        ->hasName()->toBeTrue();
 });
 
 it('makes a name', function () {
-    expect($this->component->makeName('New label'))->toBe('new_label');
+    expect($this->test->makeName('New label'))->toBe('new_label');
 });

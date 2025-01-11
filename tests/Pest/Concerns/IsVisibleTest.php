@@ -4,30 +4,28 @@ declare(strict_types=1);
 
 use Honed\Core\Concerns\IsVisible;
 
-class IsVisibleTest
+class VisibleTest
 {
     use IsVisible;
 }
 
 beforeEach(function () {
-    $this->test = new IsVisibleTest;
+    $this->test = new VisibleTest;
 });
 
-it('is `visible` by default', function () {
-    expect($this->test->isVisible())->toBeTrue();
-});
-
-it('sets visible', function () {
-    $this->test->setVisible(true);
-    expect($this->test->isVisible())->toBeTrue();
-});
-
-it('chains visible', function () {
-    expect($this->test->visible(true))->toBeInstanceOf(IsVisibleTest::class)
+it('is true by default', function () {
+    expect($this->test)
         ->isVisible()->toBeTrue();
 });
 
-it('has alias `invisible` for `visible`', function () {
-    expect($this->test->invisible(true))->toBeInstanceOf(IsVisibleTest::class)
+it('sets visible', function () {
+    expect($this->test->visible())
+        ->toBeInstanceOf(VisibleTest::class)
+        ->isVisible()->toBeTrue();
+});
+
+it('sets invisible', function () {
+    expect($this->test->invisible())
+        ->toBeInstanceOf(VisibleTest::class)
         ->isVisible()->toBeFalse();
 });

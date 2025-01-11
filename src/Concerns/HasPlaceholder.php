@@ -4,71 +4,41 @@ declare(strict_types=1);
 
 namespace Honed\Core\Concerns;
 
-/**
- * @mixin \Honed\Core\Concerns\Evaluable
- */
 trait HasPlaceholder
 {
     /**
-     * @var string|(\Closure(mixed...):string)|null
+     * @var string
      */
-    protected $placeholder = null;
+    protected $placeholder;
 
     /**
-     * Set the placeholder, chainable.
+     * Set the placeholder for the instance.
      *
-     * @param  string|(\Closure(mixed...):string)  $placeholder
+     * @param  string|null  $placeholder
      * @return $this
      */
-    public function placeholder(string|\Closure $placeholder): static
+    public function placeholder($placeholder): static
     {
-        $this->setPlaceholder($placeholder);
+        if (! \is_null($placeholder)) {
+            $this->placeholder = $placeholder;
+        }
 
         return $this;
     }
 
     /**
-     * Set the placeholder quietly.
-     *
-     * @param  string|(\Closure(mixed...):string)|null  $placeholder
+     * Get the placeholder for the instance.
      */
-    public function setPlaceholder(string|\Closure|null $placeholder): void
+    public function getPlaceholder(): ?string
     {
-        if (is_null($placeholder)) {
-            return;
-        }
-        $this->placeholder = $placeholder;
-    }
-
-    /**
-     * Get the placeholder using the given closure dependencies.
-     *
-     * @param  array<string, mixed>  $named
-     * @param  array<string, mixed>  $typed
-     */
-    public function getPlaceholder(array $named = [], array $typed = []): ?string
-    {
-        return $this->evaluate($this->placeholder, $named, $typed);
-    }
-
-    /**
-     * Resolve the placeholder using the given closure dependencies.
-     *
-     * @param  array<string, mixed>  $named
-     * @param  array<string, mixed>  $typed
-     */
-    public function resolvePlaceholder(array $named = [], array $typed = []): ?string
-    {
-        $this->setPlaceholder($this->getPlaceholder($named, $typed));
-
         return $this->placeholder;
     }
 
     /**
-     * Determine if the class has a placeholder.
+     * Determine if the instance has an placeholder set.
      */
     public function hasPlaceholder(): bool
     {
-        return ! \is_null($this->placeholder);
+        return isset($this->placeholder);
     }
 }

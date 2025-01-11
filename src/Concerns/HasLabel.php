@@ -4,90 +4,70 @@ declare(strict_types=1);
 
 namespace Honed\Core\Concerns;
 
-use Illuminate\Support\Stringable;
-
-/**
- * @mixin \Honed\Core\Concerns\Evaluable
- */
 trait HasLabel
 {
-    /**
-     * @var string|(\Closure(mixed...):string)|null
-     */
-    protected $label = null;
+    use EvaluableDependency {
+        evaluateModelForTrait as evaluateModelForLabel;
+    }
 
     /**
-     * Set the label, chainable.
+     * @var string|\Closure|null
+     */
+    protected $label;
+
+    /**
+     * Set the label for the instance.
      *
-     * @param  string|(\Closure(mixed...):string)  $label
+     * @param  string|\Closure|null  $label
      * @return $this
      */
-    public function label(string|\Closure $label): static
+    public function label($label): static
     {
-        $this->setLabel($label);
+        if (! \is_null($label)) {
+            $this->label = $label;
+        }
 
         return $this;
     }
 
     /**
-     * Set the label quietly.
+     * Get the label for the instance, evaluating it if necessary.
      *
-     * @param  string|(\Closure(mixed...):string)|null  $label
+     * @param  array<string,mixed>|\Illuminate\Database\Eloquent\Model  $parameters
+     * @param  array<string,mixed>  $typed
      */
-    public function setLabel(string|\Closure|null $label): void
+    public function getLabel($parameters = [], $typed = []): ?string
     {
-        if (\is_null($label)) {
-            return;
-        }
+        /**
+         * @var string|null
+         */
+        $evaluated = $parameters instanceof \Illuminate\Database\Eloquent\Model
+            ? $this->evaluateModelForLabel($parameters, 'getLabel')
+            : $this->evaluate($this->label, $parameters, $typed);
 
-        $this->label = $label;
+        $this->label = $evaluated;
+
+        return $evaluated;
     }
 
     /**
-     * Get the label using the given closure dependencies.
-     *
-     * @param  array<string, mixed>  $named
-     * @param  array<string, mixed>  $typed
-     */
-    public function getLabel(array $named = [], array $typed = []): ?string
-    {
-        return $this->evaluate($this->label, $named, $typed);
-    }
-
-    /**
-     * Resolve the label using the given closure dependencies.
-     *
-     * @param  array<string, mixed>  $named
-     * @param  array<string, mixed>  $typed
-     */
-    public function resolveLabel(array $named = [], array $typed = []): ?string
-    {
-        $label = $this->getLabel($named, $typed);
-        $this->setLabel($label);
-
-        return $label;
-    }
-
-    /**
-     * Determine if the class has a label.
+     * Determine if the instance has a label set.
      */
     public function hasLabel(): bool
     {
-        return ! \is_null($this->label);
+        return isset($this->label);
     }
 
     /**
      * Convert a string to the label format.
-     *
-     * @param  string|\Closure():string  $name
      */
-    public function makeLabel(string|\Closure $name): string
+    public function makeLabel(string $name): string
     {
-        return (new Stringable($this->evaluate($name)))
+        return str($name)
             ->afterLast('.')
             ->headline()
             ->lower()
             ->ucfirst()
-            ->value();
+            ->toString();
     }
 }

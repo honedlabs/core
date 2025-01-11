@@ -12,30 +12,32 @@ trait HasValue
     protected $value = null;
 
     /**
-     * Set the value to be used, chainable.
+     * Set the value for the instance.
      *
      * @return $this
      */
     public function value(mixed $value): static
     {
-        $this->setValue($value);
+        if (! \is_null($value)) {
+            $this->value = $value;
+        }
 
         return $this;
     }
 
     /**
-     * Set the value to be used quietly.
-     */
-    public function setValue(mixed $value): void
-    {
-        $this->value = $value;
-    }
-
-    /**
-     * Get the value using the given closure dependencies.
+     * Get the value for the instance.
      */
     public function getValue(): mixed
     {
         return $this->value;
+    }
+
+    /**
+     * Determine if the instance has an value set.
+     */
+    public function hasValue(): bool
+    {
+        return isset($this->value);
     }
 }

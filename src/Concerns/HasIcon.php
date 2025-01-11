@@ -4,52 +4,43 @@ declare(strict_types=1);
 
 namespace Honed\Core\Concerns;
 
-use Honed\Core\Contracts\Icon;
+use Honed\Core\Contracts\IsIcon;
 
 trait HasIcon
 {
     /**
-     * @var string|Icon|null
+     * @var string|\Honed\Core\Contracts\IsIcon
      */
     protected $icon;
 
     /**
-     * Set the icon, chainable.
+     * Set the icon for the instance.
      *
+     * @param  string|\Honed\Core\Contracts\IsIcon|null  $icon
      * @return $this
      */
-    public function icon(string|Icon $icon): static
+    public function icon($icon): static
     {
-        $this->setIcon($icon);
+        if (! \is_null($icon)) {
+            $this->icon = $icon;
+        }
 
         return $this;
     }
 
     /**
-     * Set the icon, quietly.
-     */
-    public function setIcon(string|Icon|null $icon): void
-    {
-        if (\is_null($icon)) {
-            return;
-        }
-
-        $this->icon = $icon;
-    }
-
-    /**
-     * Determine if the instance has an icon.
-     */
-    public function hasIcon(): bool
-    {
-        return ! \is_null($this->icon);
-    }
-
-    /**
-     * Get the icon.
+     * Get the icon for the instance.
      */
     public function getIcon(): ?string
     {
-        return $this->icon instanceof Icon ? $this->icon->icon() : $this->icon;
+        return $this->icon instanceof IsIcon ? $this->icon->icon() : $this->icon;
+    }
+
+    /**
+     * Determine if the instance has an icon set.
+     */
+    public function hasIcon(): bool
+    {
+        return isset($this->icon);
     }
 }

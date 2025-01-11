@@ -26,9 +26,9 @@ trait EvaluableDependency
      * @param  string  $method  The method to call on the class
      * @return mixed The evaluated trait.
      */
-    private function traitEvaluatesModel($value, $method)
+    private function evaluateModelForTrait($value, $method)
     {
-        return \call_user_func([$this, $method], [
+        return \call_user_func([$this, $method], [ // @phpstan-ignore-line
             'model' => $value,
             'record' => $value,
             'resource' => $value,

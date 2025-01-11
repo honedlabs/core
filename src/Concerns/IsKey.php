@@ -12,27 +12,19 @@ trait IsKey
     protected $key = false;
 
     /**
-     * Set the column as the key, chainable
+     * Set the instance as the key.
      *
      * @return $this
      */
     public function key(bool $key = true): static
     {
-        $this->setKey($key);
+        $this->key = $key;
 
         return $this;
     }
 
     /**
-     * Set the key value quietly
-     */
-    public function setKey(bool $key): void
-    {
-        $this->key = $key;
-    }
-
-    /**
-     * Determine if the class is the key.
+     * Determine if the instance is the key.
      */
     public function isKey(): bool
     {

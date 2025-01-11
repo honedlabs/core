@@ -4,71 +4,57 @@ declare(strict_types=1);
 
 namespace Honed\Core\Concerns;
 
-/**
- * @mixin \Honed\Core\Concerns\Evaluable
- */
 trait HasFormat
 {
-    /**
-     * @var string|(\Closure(mixed...):string)|null
-     */
-    protected $format = null;
+    use EvaluableDependency {
+        evaluateModelForTrait as evaluateModelForFormat;
+    }
 
     /**
-     * Set the format, chainable.
+     * @var string|\Closure|null
+     */
+    protected $format;
+
+    /**
+     * Set the format for the instance.
      *
-     * @param  string|(\Closure(mixed...):string)  $format
+     * @param  string|\Closure|null  $format
      * @return $this
      */
-    public function format(string|\Closure $format): static
+    public function format($format): static
     {
-        $this->setFormat($format);
+        if (! \is_null($format)) {
+            $this->format = $format;
+        }
 
         return $this;
     }
 
     /**
-     * Set the format quietly.
+     * Get the format for the instance, evaluating it if necessary.
      *
-     * @param  string|(\Closure(mixed...):string)|null  $format
+     * @param  array<string,mixed>|\Illuminate\Database\Eloquent\Model  $parameters
+     * @param  array<string,mixed>  $typed
      */
-    public function setFormat(string|\Closure|null $format): void
+    public function getFormat($parameters = [], $typed = []): ?string
     {
-        if (is_null($format)) {
-            return;
-        }
-        $this->format = $format;
+        /**
+         * @var string|null
+         */
+        $evaluated = $parameters instanceof \Illuminate\Database\Eloquent\Model
+            ? $this->evaluateModelForFormat($parameters, 'getFormat')
+            : $this->evaluate($this->format, $parameters, $typed);
+
+        $this->format = $evaluated;
+
+        return $evaluated;
     }
 
     /**
-     * Get the format using the given closure dependencies.
-     *
-     * @param  array<string, mixed>  $named
-     * @param  array<string, mixed>  $typed
-     */
-    public function getFormat(array $named = [], array $typed = []): ?string
-    {
-        return $this->evaluate($this->format, $named, $typed);
-    }
-
-    /**
-     * Resolve the format using the given closure dependencies.
-     *
-     * @param  array<string, mixed>  $named
-     * @param  array<string, mixed>  $typed
-     */
-    public function resolveFormat(array $named = [], array $typed = []): ?string
-    {
-        $this->setFormat($this->getFormat($named, $typed));
-
-        return $this->format;
-    }
-
-    /**
-     * Determine if the class has a format.
+     * Determine if the instance has a format set.
      */
     public function hasFormat(): bool
     {
-        return ! \is_null($this->format);
+        return isset($this->format);
     }
 }

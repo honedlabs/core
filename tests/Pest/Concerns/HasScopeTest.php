@@ -1,39 +1,31 @@
 <?php
 
+declare(strict_types=1);
+
 use Honed\Core\Concerns\HasScope;
 
-class HasScopeComponent
+class ScopeTest
 {
     use HasScope;
 }
 
 beforeEach(function () {
-    $this->component = new HasScopeComponent;
+    $this->test = new ScopeTest;
 });
 
-it('has no scope by default', function () {
-    expect($this->component)
-        ->getScope()->toBeNull()
+it('is null by default', function () {
+    expect($this->test)
         ->hasScope()->toBeFalse();
 });
 
-it('sets scope', function () {
-    $this->component->setScope('Scope');
-    expect($this->component)
-        ->getScope()->toBe('Scope')
+it('sets', function () {
+    expect($this->test->scope('test'))
+        ->toBeInstanceOf(ScopeTest::class)
         ->hasScope()->toBeTrue();
 });
 
-it('rejects null values', function () {
-    $this->component->setScope('Scope');
-    $this->component->setScope(null);
-    expect($this->component)
-        ->getScope()->toBe('Scope')
-        ->hasScope()->toBeTrue();
-});
-
-it('chains scope', function () {
-    expect($this->component->scope('Scope'))->toBeInstanceOf(HasScopeComponent::class)
-        ->getScope()->toBe('Scope')
+it('gets', function () {
+    expect($this->test->scope('test'))
+        ->getScope()->toBe('test')
         ->hasScope()->toBeTrue();
 });

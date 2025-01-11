@@ -12,27 +12,19 @@ trait IsDefault
     protected $default = false;
 
     /**
-     * Set the class as default, chainable
+     * Set the instance as the default.
      *
      * @return $this
      */
     public function default(bool $default = true): static
     {
-        $this->setDefault($default);
+        $this->default = $default;
 
         return $this;
     }
 
     /**
-     * Set the default quietly
-     */
-    public function setDefault(bool $default): void
-    {
-        $this->default = $default;
-    }
-
-    /**
-     * Determine if the class is default.
+     * Determine if the instance is the default.
      */
     public function isDefault(): bool
     {

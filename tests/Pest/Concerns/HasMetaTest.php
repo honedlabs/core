@@ -1,48 +1,50 @@
 <?php
 
+declare(strict_types=1);
+
 use Honed\Core\Concerns\Evaluable;
 use Honed\Core\Concerns\HasMeta;
+use Honed\Core\Tests\Stubs\Product;
 
-class HasMetaComponent
+class MetaTest
 {
     use Evaluable;
     use HasMeta;
 }
 
 beforeEach(function () {
-    $this->component = new HasMetaComponent;
+    $this->test = new MetaTest;
 });
 
-it('is empty by default', function () {
-    expect($this->component)
-        ->getMeta()->toBeEmpty()
+it('sets', function () {
+    expect($this->test->meta(['name' => 'test']))
+        ->toBeInstanceOf(MetaTest::class)
+        ->hasMeta()->toBeTrue();
+});
+
+it('gets', function () {
+    expect($this->test)
+        ->getMeta()->scoped(fn ($meta) => $meta
+        ->toBeArray()
+        ->toBeEmpty()
+        )
         ->hasMeta()->toBeFalse();
-});
 
-it('sets meta', function () {
-    $this->component->setMeta(['meta' => 'Meta']);
-    expect($this->component)
-        ->getMeta()->toEqual(['meta' => 'Meta'])
+    expect($this->test->meta(['name' => 'test']))
+        ->getMeta()->toEqual(['name' => 'test'])
         ->hasMeta()->toBeTrue();
 });
 
-it('rejects null values', function () {
-    $this->component->setMeta(['meta' => 'Meta']);
-    $this->component->setMeta(null);
-    expect($this->component)
-        ->getMeta()->toEqual(['meta' => 'Meta'])
+it('evaluates', function () {
+    $product = product();
+    expect($this->test->meta(fn (Product $product) => ['name' => $product->name]))
+        ->getMeta(['product' => $product])->toEqual(['name' => $product->name])
         ->hasMeta()->toBeTrue();
 });
 
-it('chains meta', function () {
-    expect($this->component->meta(['meta' => 'Meta']))->toBeInstanceOf(HasMetaComponent::class)
-        ->getMeta()->toEqual(['meta' => 'Meta'])
+it('evaluates model', function () {
+    $product = product();
+    expect($this->test->meta(fn (Product $product) => ['name' => $product->name]))
+        ->getMeta($product)->toEqual(['name' => $product->name])
         ->hasMeta()->toBeTrue();
-});
-
-it('resolves meta', function () {
-    expect($this->component->meta(fn ($record) => ['meta' => $record]))
-        ->toBeInstanceOf(HasMetaComponent::class)
-        ->resolveMeta(['record' => 'Meta'])->toEqual(['meta' => 'Meta'])
-        ->getMeta()->toEqual(['meta' => 'Meta']);
 });

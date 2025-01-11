@@ -7,31 +7,44 @@ beforeEach(function () {
     $this->formatter = DateFormatter::make();
 });
 
-it('can be made', function () {
-    $formatter = DateFormatter::make();
-    expect($formatter)->toBeInstanceOf(DateFormatter::class);
+it('makes', function () {
+    expect(DateFormatter::make())
+        ->toBeInstanceOf(DateFormatter::class);
 });
 
-it('accepts arguments', function () {
-    $formatter = DateFormatter::make('d M Y', true, 'Europe/London');
-    expect($formatter->getDateFormat())->toBe('d M Y');
-    expect($formatter->getTimezone())->toBe('Europe/London');
-    expect($formatter->isDifference())->toBeTrue();
+it('defaults to d/m/Y', function () {
+    expect($this->formatter->getDate())->toBe('d/m/Y');
 });
 
-it('parses and formats a string value', function () {
-    expect($this->formatter->format('january 1st 2000'))->toBe('01/01/2000');
+it('sets date', function () {
+    expect($this->formatter->date('dd-mm-yyyy'))
+        ->toBeInstanceOf(DateFormatter::class)
+        ->getDate()->toBe('dd-mm-yyyy');
 });
 
-it('parses and formats using difference', function () {
+it('sets timezone', function () {
+    expect($this->formatter->timezone('Europe/London'))
+        ->toBeInstanceOf(DateFormatter::class)
+        ->getTimezone()->toBe('Europe/London')
+        ->hasTimezone()->toBeTrue();
+});
+
+it('sets since', function () {
+    expect($this->formatter->since())
+        ->toBeInstanceOf(DateFormatter::class)
+        ->isSince()->toBeTrue();
+});
+
+it('formats', function () {
     Carbon::setTestNow('2000-01-02');
+
+    expect($this->formatter->format('2000-01-01'))->toBe('01/01/2000');
+
+    expect($this->formatter->date('Y')->format('2000-01-01'))->toBe('2000');
+
     expect($this->formatter->since()->format('2000-01-01'))->toBe('1 day ago');
-});
 
-it('hides values which could not be parsed', function () {
-    expect($this->formatter->format('invalid date'))->toBeNull();
-});
-
-it('rejects null values from formatting', function () {
     expect($this->formatter->format(null))->toBeNull();
+
+    expect($this->formatter->format('testing'))->toBeNull();
 });

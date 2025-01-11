@@ -12,27 +12,29 @@ trait IsActive
     protected $active = false;
 
     /**
-     * Set the active property, chainable.
+     * Set the instance as active.
      *
      * @return $this
      */
     public function active(bool $active = true): static
     {
-        $this->setActive($active);
+        $this->active = $active;
 
         return $this;
     }
 
     /**
-     * Set the active property quietly.
+     * Set the instance as inactive.
+     *
+     * @return $this
      */
-    public function setActive(bool $active): void
+    public function inactive(bool $inactive = true): static
     {
-        $this->active = $active;
+        return $this->active(! $inactive);
     }
 
     /**
-     * Determine if the class is active.
+     * Determine if the instance is active.
      */
     public function isActive(): bool
     {

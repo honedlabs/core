@@ -4,77 +4,58 @@ declare(strict_types=1);
 
 namespace Honed\Core\Concerns;
 
-use Closure;
-
-/**
- * @mixin \Honed\Core\Concerns\Evaluable
- */
 trait HasMeta
 {
+    use EvaluableDependency {
+        evaluateModelForTrait as evaluateModelForMeta;
+    }
+
     /**
-     * @var array<array-key,mixed>|\Closure(mixed...):array<array-key,mixed>
+     * @var array<string,mixed>|\Closure
      */
     protected $meta = [];
 
     /**
-     * Set the meta, chainable.
+     * Get or set the meta for the instance.
      *
-     * @param  array<array-key,mixed>|\Closure(mixed...):array<array-key,mixed>  $meta
+     * @param  array<string,mixed>|\Closure|null  $meta
      * @return $this
      */
-    public function meta(array|Closure $meta): static
+    public function meta($meta = null): static
     {
-        $this->setMeta($meta);
+        if (! \is_null($meta)) {
+            $this->meta = $meta;
+        }
 
         return $this;
     }
 
     /**
-     * Set the meta quietly.
+     * Get the meta for the instance, evaluating it if necessary.
      *
-     * @param  array<array-key,mixed>|\Closure(mixed...):array<array-key,mixed>|null  $meta
+     * @param  array<string,mixed>|\Illuminate\Database\Eloquent\Model  $parameters
+     * @param  array<string,mixed>  $typed
+     * @return array<string,mixed>
      */
-    public function setMeta(array|Closure|null $meta): void
+    public function getMeta($parameters = [], $typed = []): array
     {
-        if (\is_null($meta)) {
-            return;
-        }
+        /**
+         * @var array<string,mixed>
+         */
+        $evaluated = (array) ($parameters instanceof \Illuminate\Database\Eloquent\Model
+            ? $this->evaluateModelForMeta($parameters, 'getMeta')
+            : $this->evaluate($this->meta, $parameters, $typed));
 
-        $this->meta = $meta;
+        $this->meta = $evaluated;
+
+        return $evaluated;
     }
 
     /**
-     * Get the meta using the given closure dependencies.
-     *
-     * @param  array<string, mixed>  $named
-     * @param  array<string, mixed>  $typed
-     * @return array<array-key, mixed>
-     */
-    public function getMeta(array $named = [], array $typed = []): array
-    {
-        return $this->evaluate($this->meta, $named, $typed);
-    }
-
-    /**
-     * Resolve the meta using the given closure dependencies.
-     *
-     * @param  array<string, mixed>  $named
-     * @param  array<string, mixed>  $typed
-     * @return array<array-key, mixed>
-     */
-    public function resolveMeta(array $named = [], array $typed = []): array
-    {
-        $meta = $this->getMeta($named, $typed);
-        $this->setMeta($meta);
-
-        return $meta;
-    }
-
-    /**
-     * Determine if the class has metadata.
+     * Determine if the instance has meta set.
      */
     public function hasMeta(): bool
     {
-        return \is_array($this->meta) ? \count($this->meta) > 0 : true;
+        return $this->meta instanceof \Closure || \count($this->meta) > 0;
     }
 }

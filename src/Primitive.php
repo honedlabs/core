@@ -10,24 +10,45 @@ use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\Tappable;
 
 /**
- * @implements Arrayable<string, mixed>
+ * @template TKey of string
+ * @template TValue of mixed
+ *
+ * @implements Arrayable<TKey,TValue>
  */
 abstract class Primitive implements \JsonSerializable, Arrayable, Contracts\Makeable
 {
-    use Concerns\Assignable;
-    use Concerns\Configurable;
     use Concerns\Evaluable;
     use Conditionable;
     use Macroable;
     use Tappable;
 
+    /**
+     * Construct the instance.
+     *
+     * @return void
+     */
     public function __construct()
     {
-        $this->configure();
+        $this->setUp();
     }
 
+    /**
+     * Serialize the instance
+     *
+     * @return array<mixed>
+     */
     public function jsonSerialize(): mixed
     {
-        return $this->toArray();
+        return \array_filter($this->toArray(), static fn ($value) => ! \is_null($value));
+    }
+
+    /**
+     * Provide the instance with any necessary setup.
+     *
+     * @return void
+     */
+    public function setUp()
+    {
+        //
     }
 }

@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Honed\Core\Concerns;
 
 /**
- * @property class-string $anonymous
+ * @property-read class-string $anonymous
  */
 trait IsAnonymous
 {
     /**
-     * Determine if the class is anonymous.
+     * Determine if the instance is anonymous.
      */
     public function isAnonymous(): bool
     {

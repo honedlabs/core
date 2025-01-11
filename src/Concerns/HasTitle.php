@@ -4,71 +4,57 @@ declare(strict_types=1);
 
 namespace Honed\Core\Concerns;
 
-/**
- * @mixin \Honed\Core\Concerns\Evaluable
- */
 trait HasTitle
 {
-    /**
-     * @var string|(\Closure(mixed...):string)|null
-     */
-    protected $title = null;
+    use EvaluableDependency {
+        evaluateModelForTrait as evaluateModelForTitle;
+    }
 
     /**
-     * Set the title, chainable.
+     * @var string|\Closure|null
+     */
+    protected $title;
+
+    /**
+     * Set the title for the instance.
      *
-     * @param  string|\Closure(mixed...)  $title
+     * @param  string|\Closure|null  $title
      * @return $this
      */
-    public function title(string|\Closure $title): static
+    public function title($title): static
     {
-        $this->setTitle($title);
+        if (! \is_null($title)) {
+            $this->title = $title;
+        }
 
         return $this;
     }
 
     /**
-     * Set the title quietly.
+     * Get the title for the instance, evaluating it if necessary.
      *
-     * @param  string|(\Closure(mixed...):string)|null  $title
+     * @param  array<string,mixed>|\Illuminate\Database\Eloquent\Model  $parameters
+     * @param  array<string,mixed>  $typed
      */
-    public function setTitle(string|\Closure|null $title): void
+    public function getTitle($parameters = [], $typed = []): ?string
     {
-        if (is_null($title)) {
-            return;
-        }
-        $this->title = $title;
+        /**
+         * @var string|null
+         */
+        $evaluated = $parameters instanceof \Illuminate\Database\Eloquent\Model
+            ? $this->evaluateModelForTitle($parameters, 'getTitle')
+            : $this->evaluate($this->title, $parameters, $typed);
+
+        $this->title = $evaluated;
+
+        return $evaluated;
     }
 
     /**
-     * Get the title using the given closure dependencies.
-     *
-     * @param  array<string, mixed>  $named
-     * @param  array<string, mixed>  $typed
-     */
-    public function getTitle(array $named = [], array $typed = []): ?string
-    {
-        return $this->evaluate($this->title, $named, $typed);
-    }
-
-    /**
-     * Resolve the title using the given closure dependencies.
-     *
-     * @param  array<string, mixed>  $named
-     * @param  array<string, mixed>  $typed
-     */
-    public function resolveTitle(array $named = [], array $typed = []): ?string
-    {
-        $this->setTitle($this->getTitle($named, $typed));
-
-        return $this->title;
-    }
-
-    /**
-     * Determine if the class has a title.
+     * Determine if the instance has a title set.
      */
     public function hasTitle(): bool
     {
-        return ! \is_null($this->title);
+        return isset($this->title);
     }
 }

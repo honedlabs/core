@@ -4,88 +4,68 @@ declare(strict_types=1);
 
 namespace Honed\Core\Concerns;
 
-use Illuminate\Support\Stringable;
-
-/**
- * @mixin \Honed\Core\Concerns\Evaluable
- */
 trait HasName
 {
-    /**
-     * @var string|\Closure(mixed...):string|null
-     */
-    protected $name = null;
+    use EvaluableDependency {
+        evaluateModelForTrait as evaluateModelForName;
+    }
 
     /**
-     * Set the name, chainable.
+     * @var string|\Closure|null
+     */
+    protected $name;
+
+    /**
+     * Set the name for the instance.
      *
-     * @param  string|(\Closure(mixed...):string)  $name
+     * @param  string|\Closure|null  $name
      * @return $this
      */
-    public function name(string|\Closure $name): static
+    public function name($name): static
     {
-        $this->setName($name);
+        if (! \is_null($name)) {
+            $this->name = $name;
+        }
 
         return $this;
     }
 
     /**
-     * Set the name quietly.
+     * Get the name for the instance, evaluating it if necessary.
      *
-     * @param  string|(\Closure(mixed...):string)|null  $name
+     * @param  array<string,mixed>|\Illuminate\Database\Eloquent\Model  $parameters
+     * @param  array<string,mixed>  $typed
      */
-    public function setName(string|\Closure|null $name): void
+    public function getName($parameters = [], $typed = []): ?string
     {
-        if (\is_null($name)) {
-            return;
-        }
+        /**
+         * @var string|null
+         */
+        $evaluated = $parameters instanceof \Illuminate\Database\Eloquent\Model
+            ? $this->evaluateModelForName($parameters, 'getName')
+            : $this->evaluate($this->name, $parameters, $typed);
 
-        $this->name = $name;
+        $this->name = $evaluated;
+
+        return $evaluated;
     }
 
     /**
-     * Get the name using the given closure dependencies.
-     *
-     * @param  array<string, mixed>  $named
-     * @param  array<string, mixed>  $typed
-     */
-    public function getName(array $named = [], array $typed = []): ?string
-    {
-        return $this->evaluate($this->name, $named, $typed);
-    }
-
-    /**
-     * Resolve the name using the given closure dependencies.
-     *
-     * @param  array<string, mixed>  $named
-     * @param  array<string, mixed>  $typed
-     */
-    public function resolveName(array $named = [], array $typed = []): ?string
-    {
-        $name = $this->getName($named, $typed);
-        $this->setName($name);
-
-        return $name;
-    }
-
-    /**
-     * Determine if the class has a name.
+     * Determine if the instance has a name set.
      */
     public function hasName(): bool
     {
-        return ! \is_null($this->name);
+        return isset($this->name);
     }
 
     /**
      * Convert a string to the name format
-     *
-     * @param  string|\Stringable|(\Closure():string|\Stringable)  $label
      */
     public function makeName(string $label): string
     {
-        return (new Stringable($label))
+        return str($label)
             ->snake()
             ->lower()
-            ->value();
+            ->toString();
     }
 }

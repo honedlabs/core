@@ -2,20 +2,21 @@
 
 declare(strict_types=1);
 
+use Honed\Core\Concerns\HasDescription;
+use Honed\Core\Concerns\HasName;
 use Honed\Core\Concerns\HasType;
 use Honed\Core\Primitive;
 
-class PrimitiveComponent extends Primitive
+class PrimitiveTest extends Primitive
 {
+    use HasDescription;
+    use HasName;
     use HasType;
 
-    public ?string $key = null;
-
-    public function configure(): static
+    protected function setUp()
     {
-        $this->type = 'primitive';
-
-        return $this;
+        $this->type('primitive');
+        $this->name('test');
     }
 
     public static function make(): static
@@ -27,25 +28,34 @@ class PrimitiveComponent extends Primitive
     {
         return [
             'type' => $this->getType(),
+            'name' => $this->getName(),
+            'description' => $this->getDescription(),
         ];
     }
 }
 
 beforeEach(function () {
-    $this->component = new PrimitiveComponent;
+    $this->test = new PrimitiveTest;
 });
 
-it('can be made', function () {
-    expect(PrimitiveComponent::make())->toBeInstanceOf(PrimitiveComponent::class)
-        ->getType()->toBe('primitive');
+it('makes', function () {
+    expect(PrimitiveTest::make())->toBeInstanceOf(PrimitiveTest::class)
+        ->getType()->toBe('primitive')
+        ->getName()->toBe('test')
+        ->getDescription()->toBeNull();
 });
 
 it('has array representation', function () {
-    expect($this->component->toArray())->toEqual([
+    expect($this->test->toArray())->toEqual([
         'type' => 'primitive',
+        'name' => 'test',
+        'description' => null,
     ]);
 });
 
-it('is serializable', function () {
-    expect($this->component->jsonSerialize())->toEqual($this->component->toArray());
+it('serializes', function () {
+    expect($this->test->jsonSerialize())->toEqual([
+        'type' => 'primitive',
+        'name' => 'test',
+    ]);
 });

@@ -9,7 +9,12 @@ use Honed\Core\Exceptions\MissingRequiredAttributeException;
 trait RequiresKey
 {
     /**
-     * Retrieve the key property
+     * @var string
+     */
+    protected $key;
+
+    /**
+     * Retrieve the key property.
      *
      * @throws MissingRequiredAttributeException
      */

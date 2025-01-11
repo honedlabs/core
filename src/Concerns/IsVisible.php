@@ -12,19 +12,19 @@ trait IsVisible
     protected $visible = true;
 
     /**
-     * Set as visible, chainable.
+     * Set the instance as visible.
      *
      * @return $this
      */
     public function visible(bool $visible = true): static
     {
-        $this->setVisible($visible);
+        $this->visible = $visible;
 
         return $this;
     }
 
     /**
-     * Set as invisible, chainable.
+     * Set the instance as invisible.
      *
      * @return $this
      */
@@ -34,15 +34,7 @@ trait IsVisible
     }
 
     /**
-     * Set the visibility property quietly.
-     */
-    public function setVisible(bool $visible): void
-    {
-        $this->visible = $visible;
-    }
-
-    /**
-     * Determine if it is visible.
+     * Determine if the instance is visible.
      */
     public function isVisible(): bool
     {
