@@ -94,7 +94,7 @@ class Destination extends Primitive implements ResolvesClosures
 
     /**
      * Get the href for this destination.
-     * 
+     *
      * @param  mixed  $parameters
      * @param  array<string,mixed>|null  $typed
      */

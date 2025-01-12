@@ -13,7 +13,7 @@ class PrimitiveTest extends Primitive
     use HasName;
     use HasType;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->type('primitive');
         $this->name('test');

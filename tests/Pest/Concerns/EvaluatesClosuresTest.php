@@ -9,8 +9,8 @@ use Honed\Core\Tests\Stubs\Product;
 
 class EvaluatesClosuresTest
 {
-    use Evaluable;
     use Allowable;
+    use Evaluable;
     use EvaluatesClosures;
 }
 

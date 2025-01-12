@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use Pest\Expectation;
 use Honed\Core\Destination;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Str;
+use Pest\Expectation;
 use Symfony\Component\HttpFoundation\Request;
 
 beforeEach(function () {

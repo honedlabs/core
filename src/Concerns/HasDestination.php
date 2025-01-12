@@ -77,7 +77,6 @@ trait HasDestination
 
         $parameter = collect((new \ReflectionFunction($destination))->getParameters())->first();
 
-
         return (($t = $parameter->getType()) instanceof \ReflectionNamedType && $t->getName() === Destination::class)
             || $parameter->getName() === 'destination';
     }
