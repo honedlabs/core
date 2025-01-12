@@ -6,7 +6,7 @@ namespace Honed\Core\Concerns;
 
 trait HasName
 {
-    use EvaluableDependency {
+    use EvaluatesClosures {
         evaluateModelForTrait as evaluateModelForName;
     }
 
@@ -61,8 +61,12 @@ trait HasName
     /**
      * Convert a string to the name format
      */
-    public function makeName(string $label): string
+    public function makeName(?string $label): ?string
     {
+        if (\is_null($label)) {
+            return null;
+        }
+
         return str($label)
             ->snake()
             ->lower()

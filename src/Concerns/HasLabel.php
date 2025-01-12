@@ -6,7 +6,7 @@ namespace Honed\Core\Concerns;
 
 trait HasLabel
 {
-    use EvaluableDependency {
+    use EvaluatesClosures {
         evaluateModelForTrait as evaluateModelForLabel;
     }
 
@@ -61,8 +61,12 @@ trait HasLabel
     /**
      * Convert a string to the label format.
      */
-    public function makeLabel(string $name): string
+    public function makeLabel(?string $name): ?string
     {
+        if (\is_null($name)) {
+            return null;
+        } 
+
         return str($name)
             ->afterLast('.')
             ->headline()
