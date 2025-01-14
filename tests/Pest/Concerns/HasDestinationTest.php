@@ -24,7 +24,7 @@ it('sets class', function () {
         ->getDestination()->scoped(fn ($destination) => $destination
         ->goesTo()->toBe('product.show')
         ->getParameters()->toBe($this->product)
-        ->getHref($this->product)->toBe(route('product.show', $this->product))
+        ->get($this->product)->toBe(route('product.show', $this->product))
         );
 });
 
@@ -34,9 +34,9 @@ it('sets closure', function () {
     expect($this->test->to($fn))
         ->toBeInstanceOf(DestinationTest::class)
         ->hasDestination()->toBeTrue()
-        ->getDestination()->scoped(fn ($destination) => $destination
+        ->getDestination($this->product)->scoped(fn ($destination) => $destination
         ->goesTo()->toBeInstanceOf(\Closure::class)
-        ->getHref($this->product)->toBe(route('product.show', $this->product))
+        ->get()->toBe(route('product.show', $this->product))
         );
 });
 
@@ -46,7 +46,7 @@ it('sets string', function () {
         ->hasDestination()->toBeTrue()
         ->getDestination()->scoped(fn ($destination) => $destination
         ->goesTo()->toBe('https://honed.dev')
-        ->getHref()->toBe('https://honed.dev')
+        ->get()->toBe('https://honed.dev')
         );
 });
 
@@ -59,7 +59,7 @@ it('sets destination closure', function () {
         ->getDestination()->scoped(fn ($destination) => $destination
         ->goesTo()->toBe('product.show')
         ->getParameters()->toBe($this->product)
-        ->getHref($this->product)->toBe(route('product.show', $this->product))
+        ->get($this->product)->toBe(route('product.show', $this->product))
         );
 });
 
