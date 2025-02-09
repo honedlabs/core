@@ -45,3 +45,4 @@ it('decodes', function () {
     expect($this->test->scope($this->param))
         ->decodeScope('scope[test]')->toBe('test');
 });
+
