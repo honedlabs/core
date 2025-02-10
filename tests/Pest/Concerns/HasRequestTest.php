@@ -10,6 +10,7 @@ class RequestTest
     use HasRequest;
 }
 
+
 beforeEach(function () {
     $this->request = Request::create('/');
     $this->test = new RequestTest;
@@ -21,7 +22,9 @@ it('sets', function () {
         ->getRequest()->toBe($this->request);
 });
 
+
 it('gets', function () {
     expect($this->test->request($this->request))
         ->getRequest()->toBe($this->request);
 });
+

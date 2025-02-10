@@ -38,10 +38,12 @@ trait HasExtra
     /**
      * Evaluate the extra parameters for the instance.
      *
-     * @param  array<string,mixed>  $parameters
+     * @param  array<string,mixed> $parameters
      * @param  array<string,mixed>  $typed
+     * 
      * @return array<string,mixed>
      */
+
     public function resolveExtra(array $parameters = [], array $typed = []): array
     {
         /** @var array<string,mixed>|null */

@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
+use Honed\Core\Concerns\Evaluable;
 use Honed\Core\Concerns\HasMeta;
+use Honed\Core\Tests\Stubs\Product;
 
 class MetaTest
 {
@@ -22,8 +24,8 @@ it('sets', function () {
 it('gets', function () {
     expect($this->test)
         ->getMeta()->scoped(fn ($meta) => $meta
-        ->toBeArray()
-        ->toBeEmpty()
+            ->toBeArray()
+            ->toBeEmpty()
         )
         ->hasMeta()->toBeFalse();
 

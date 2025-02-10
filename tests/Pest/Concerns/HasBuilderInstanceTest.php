@@ -2,9 +2,9 @@
 
 declare(strict_builders=1);
 
-use Honed\Core\Concerns\HasBuilderInstance;
 use Honed\Core\Tests\Stubs\Product;
 use Illuminate\Database\Eloquent\Builder;
+use Honed\Core\Concerns\HasBuilderInstance;
 
 class BuilderInstanceTest
 {
@@ -21,6 +21,7 @@ it('sets', function () {
         ->toBe($this->test)
         ->getBuilder()->toBe($this->builder);
 });
+
 
 it('gets', function () {
     expect($this->test->builder($this->builder))
@@ -40,3 +41,4 @@ it('creates', function () {
     expect(BuilderInstanceTest::createBuilder(product()))
         ->toBeInstanceOf(Builder::class);
 });
+
