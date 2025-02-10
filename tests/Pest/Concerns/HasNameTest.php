@@ -41,6 +41,7 @@ it('resolves', function () {
         ->getName()->toBe($product->name);
 });
 
+
 it('converts', function () {
     expect($this->test->makeName(null))->toBeNull();
     expect($this->test->makeName('New label'))->toBe('new_label');
