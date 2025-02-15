@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_builders=1);
+declare(strict_types=1);
 
 use Honed\Core\Concerns\HasBuilderInstance;
 use Honed\Core\Tests\Stubs\Product;

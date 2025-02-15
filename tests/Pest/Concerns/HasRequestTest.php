@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_requests=1);
+declare(strict_types=1);
 
 use Honed\Core\Concerns\HasRequest;
 use Illuminate\Support\Facades\Request;
