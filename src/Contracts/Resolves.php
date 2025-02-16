@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Honed\Core\Contracts;
 
-interface ResolvesClosures
+interface Resolves
 {
     /**
      * Evaluate the class properties using the provided parameters and typed parameters.
@@ -13,5 +13,5 @@ interface ResolvesClosures
      * @param  array<string,mixed>  $typed
      * @return $this
      */
-    public function resolve($parameters = [], $typed = []): static;
+    public function resolve(array $parameters = [], array $typed = []): static;
 }
