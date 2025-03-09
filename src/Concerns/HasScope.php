@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Honed\Core\Concerns;
 
-use Honed\Core\CoreServiceProvider;
 use Illuminate\Support\Str;
 
 trait HasScope
 {
     /**
+     * The scope to use for the instance.
+     *
      * @var string|null
      */
     protected $scope;
@@ -46,7 +47,7 @@ trait HasScope
      */
     public function hasScope()
     {
-        return ! \is_null($this->scope);
+        return isset($this->scope);
     }
 
     /**
@@ -61,7 +62,7 @@ trait HasScope
             return $value;
         }
 
-        return \sprintf('%s%s%s', $this->getScope(), CoreServiceProvider::SCOPE_DELIMITER, $value);
+        return \sprintf('%s:%s', $this->getScope(), $value);
     }
 
     /**
@@ -73,7 +74,7 @@ trait HasScope
     public function decodeScope($value)
     {
         return Str::of($value)
-            ->after(CoreServiceProvider::SCOPE_DELIMITER)
+            ->after(':')
             ->toString();
     }
 }
