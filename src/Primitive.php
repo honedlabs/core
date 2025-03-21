@@ -4,24 +4,18 @@ declare(strict_types=1);
 
 namespace Honed\Core;
 
-use Honed\Core\Contracts\Makeable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Traits\Conditionable;
-use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\Tappable;
 
 /**
- * @template TKey of string
- * @template TValue of mixed
- *
- * @implements Arrayable<TKey,TValue>
+ * @implements Arrayable<string,mixed>
  */
-abstract class Primitive implements \JsonSerializable, Arrayable, Makeable
+abstract class Primitive implements \JsonSerializable, Arrayable
 {
     use Concerns\Evaluable;
     use Conditionable;
-    use ForwardsCalls;
     use Macroable {
         __call as macroCall;
     }
@@ -55,10 +49,7 @@ abstract class Primitive implements \JsonSerializable, Arrayable, Makeable
      *
      * @return void
      */
-    public function setUp()
-    {
-        //
-    }
+    public function setUp() { }
 
     /**
      * Handle dynamic method calls into the method.
@@ -71,10 +62,6 @@ abstract class Primitive implements \JsonSerializable, Arrayable, Makeable
      */
     public function __call($method, $parameters)
     {
-        if (static::hasMacro($method)) {
-            return $this->macroCall($method, $parameters);
-        }
-
-        static::throwBadMethodCallException($method);
+        return $this->macroCall($method, $parameters);
     }
 }
