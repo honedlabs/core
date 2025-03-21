@@ -57,7 +57,7 @@ it('has query from method', function () {
 
         public function usingQuery(Builder $b, int $value)
         {
-            $b->where('id', $value);   
+            $b->where('id', $value);
         }
     };
 
