@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Honed\Core\Primitive;
 use Honed\Core\Tests\Fixtures\Column;
 
 beforeEach(function () {
