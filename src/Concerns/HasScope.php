@@ -29,13 +29,23 @@ trait HasScope
     }
 
     /**
+     * Define the scope.
+     *
+     * @return string|null
+     */
+    public function defineScope()
+    {
+        return null;
+    }
+
+    /**
      * Get the scope.
      *
      * @return string|null
      */
     public function getScope()
     {
-        return $this->scope;
+        return $this->scope ??= $this->defineScope();
     }
 
     /**
@@ -45,7 +55,7 @@ trait HasScope
      */
     public function hasScope()
     {
-        return isset($this->scope);
+        return filled($this->getScope());
     }
 
     /**

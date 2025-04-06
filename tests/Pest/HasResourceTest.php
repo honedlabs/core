@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Honed\Core\Concerns\HasBuilderInstance;
+use Honed\Core\Concerns\HasResource;
 use Honed\Core\Contracts\Builds;
 use Honed\Core\Tests\Stubs\Product;
 use Honed\Core\Tests\Stubs\Status;
@@ -12,46 +12,48 @@ beforeEach(function () {
     $this->builder = Product::query();
     $this->test = new class
     {
-        use HasBuilderInstance;
+        use HasResource;
     };
 });
 
 it('accesses', function () {
     expect($this->test)
-        ->hasBuilder()->toBeFalse()
-        ->builder(Product::query())->toBe($this->test)
-        ->getBuilder()->toBeInstanceOf(Builder::class)
-        ->hasBuilder()->toBeTrue();
+        ->defineResource()->toBeNull()
+        ->resource(Product::query())->toBe($this->test)
+        ->getResource()->toBeInstanceOf(Builder::class)
+        ->hasResource()->toBeTrue();
 });
 
-it('accesses via contract', function () {
-    $test = new class implements Builds {
-        use HasBuilderInstance;
+it('defines', function () {
+    $test = new class {
+        use HasResource;
 
-        public function for()
+        public function defineResource()
         {
             return Product::query();
         }
     };
 
-    expect($test->getBuilder())->toBeInstanceOf(Builder::class);
+    expect($test)
+        ->hasResource()->toBeTrue()
+        ->getResource()->toBeInstanceOf(Builder::class);
 });
 
 it('cannot retrieve without a builder', function () {
-    $this->test->getBuilder();
+    $this->test->getResource();
 })->throws(\RuntimeException::class);
 
-it('creates', function () {
-    expect($this->test->createBuilder(Product::query()))
+it('converts to builder', function () {
+    expect($this->test->asBuilder(Product::query()))
         ->toBeInstanceOf(Builder::class);
 
-    expect($this->test->createBuilder(Product::class))
+    expect($this->test->asBuilder(Product::class))
         ->toBeInstanceOf(Builder::class);
 
-    expect($this->test->createBuilder(product()))
+    expect($this->test->asBuilder(product()))
         ->toBeInstanceOf(Builder::class);
 });
 
 it('cannot create without a valid builder', function () {
-    $this->test->createBuilder(Status::cases());
+    $this->test->asBuilder(Status::cases());
 })->throws(\InvalidArgumentException::class);
