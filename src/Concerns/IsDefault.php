@@ -1,15 +1,11 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Honed\Core\Concerns;
 
 trait IsDefault
 {
     /**
      * Whether it is the default.
-     *
-     * @default false
      *
      * @var bool
      */

@@ -1,8 +1,9 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Honed\Core\Concerns;
+
+use Closure;
+use Honed\Core\Contracts\WithTransformer;
 
 trait Transformable
 {
@@ -11,14 +12,14 @@ trait Transformable
      *
      * @default null
      *
-     * @var \Closure(mixed):mixed|null
+     * @var Closure(mixed):mixed|null
      */
     protected $transformer = null;
 
     /**
      * Set the transformer function.
      *
-     * @param  \Closure(mixed):mixed  $transformer
+     * @param  Closure(mixed):mixed  $transformer
      * @return $this
      */
     public function transformer($transformer)
@@ -29,23 +30,21 @@ trait Transformable
     }
 
     /**
-     * Define the transformer function.
-     *
-     * @return \Closure(mixed):mixed|null
-     */
-    public function defineTransformer()
-    {
-        return null;
-    }
-
-    /**
      * Get the transformer function.
      *
-     * @return \Closure(mixed):mixed|null
+     * @return Closure(mixed):mixed|null
      */
     public function getTransformer()
     {
-        return $this->transformer ??= $this->defineTransformer();
+        if (isset($this->transformer)) {
+            return $this->transformer;
+        }
+
+        if ($this instanceof WithTransformer) {
+            return $this->transformer = Closure::fromCallable([$this, 'transformUsing']);
+        }
+
+        return null;
     }
 
     /**

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Honed\Core\Concerns;
 
 trait HasType
@@ -9,7 +7,7 @@ trait HasType
     /**
      * The type for the instance.
      *
-     * @var string
+     * @var string|null
      */
     protected $type;
 
@@ -27,23 +25,13 @@ trait HasType
     }
 
     /**
-     * Define the type.
-     *
-     * @return string|null
-     */
-    public function defineType()
-    {
-        return null;
-    }
-
-    /**
      * Get the type.
      *
      * @return string|null
      */
     public function getType()
     {
-        return $this->type ??= $this->defineType();
+        return $this->type;
     }
 
     /**

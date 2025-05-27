@@ -1,15 +1,19 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Honed\Core\Concerns;
 
+use Honed\Core\Exceptions\InvalidResourceException;
+use Honed\Core\Exceptions\ResourceNotSetException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use InvalidArgumentException;
+
+use function class_exists;
+use function is_string;
 
 /**
- * @template TModel of \Illuminate\Database\Eloquent\Model
- * @template TBuilder of \Illuminate\Database\Eloquent\Builder<TModel>
+ * @template TModel of \Illuminate\Database\Eloquent\Model = \Illuminate\Database\Eloquent\Model
+ * @template TBuilder of \Illuminate\Database\Eloquent\Builder<TModel> = \Illuminate\Database\Eloquent\Builder<TModel>
  */
 trait HasResource
 {
@@ -21,16 +25,35 @@ trait HasResource
     protected $resource;
 
     /**
+     * Create a new builder instance from a resource.
+     *
+     * @param  TBuilder|TModel|class-string<TModel>  $resource
+     * @return TBuilder|null
+     *
+     * @throws InvalidResourceException
+     */
+    public static function throughBuilder($resource)
+    {
+        return match (true) {
+            ! $resource => null,
+            $resource instanceof Builder => $resource,
+            $resource instanceof Model => $resource::query(),
+            is_string($resource) && class_exists($resource) => $resource::query(),
+            default => InvalidResourceException::throw(static::class),
+        };
+    }
+
+    /**
      * Set the builder resource.
      *
      * @param  TBuilder|TModel|class-string<TModel>  $resource
      * @return $this
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
-    public function resource($resource)
+    public function withResource($resource)
     {
-        $this->resource = $this->asBuilder($resource);
+        $this->resource = $this->throughBuilder($resource);
 
         return $this;
     }
@@ -40,7 +63,7 @@ trait HasResource
      *
      * @return TBuilder|TModel|class-string<TModel>|null
      */
-    public function defineResource()
+    public function resource()
     {
         return null;
     }
@@ -50,18 +73,18 @@ trait HasResource
      *
      * @return TBuilder
      *
-     * @throws \RuntimeException
-     * @throws \InvalidArgumentException
+     * @throws InvalidResourceException
+     * @throws ResourceNotSetException
      */
     public function getResource()
     {
-        $resource = $this->resource ??= $this->defineResource();
+        $resource = $this->resource ??= $this->throughBuilder($this->resource());
 
         if (! $resource) {
-            static::throwResourceException();
+            ResourceNotSetException::throw(static::class);
         }
 
-        return $this->asBuilder($resource);
+        return $resource;
     }
 
     /**
@@ -72,64 +95,5 @@ trait HasResource
     public function hasResource()
     {
         return filled($this->getResource());
-    }
-
-    /**
-     * Create a new builder instance from a resource.
-     *
-     * @param  TBuilder|TModel|class-string<TModel>  $resource
-     * @return TBuilder
-     */
-    public static function asBuilder($resource)
-    {
-        if ($resource instanceof Builder) {
-            return $resource;
-        }
-
-        if ($resource instanceof Model) {
-            return $resource::query();
-        }
-
-        if (\is_string($resource) && \class_exists($resource)) {
-            return $resource::query();
-        }
-
-        static::throwInvalidResourceException();
-    }
-
-    /**
-     * Throw a missing resource exception.
-     *
-     * @param  string  $message
-     * @return never
-     *
-     * @throws \RuntimeException
-     */
-    public static function throwResourceException()
-    {
-        throw new \RuntimeException(
-            \sprintf(
-                'Resource has not been set for [%s].',
-                static::class
-            )
-        );
-    }
-
-    /**
-     * Throw an invalid builder exception.
-     *
-     * @param  string  $message
-     * @return never
-     *
-     * @throws \InvalidArgumentException
-     */
-    public static function throwInvalidResourceException()
-    {
-        throw new \InvalidArgumentException(
-            \sprintf(
-                'No builder instance can be synthesized for given resource [%s].',
-                static::class
-            )
-        );
     }
 }

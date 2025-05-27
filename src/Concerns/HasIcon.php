@@ -1,41 +1,34 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Honed\Core\Concerns;
 
-use Honed\Core\Contracts\HasIcon as HasIconContract;
+use BackedEnum;
+use UnitEnum;
 
 trait HasIcon
 {
     /**
      * The icon.
      *
-     * @var string|\Honed\Core\Contracts\Icon|\Closure(...mixed):string|\Honed\Core\Contracts\Icon|null
+     * @var string|(\Closure(...mixed):string)|null
      */
     protected $icon;
 
     /**
      * Set the icon.
      *
-     * @param  string|\Honed\Core\Contracts\Icon|\Closure(...mixed):string|\Honed\Core\Contracts\Icon|null  $icon
+     * @param  string|BackedEnum|UnitEnum|null  $icon
      * @return $this
      */
     public function icon($icon)
     {
-        $this->icon = $icon;
+        $this->icon = match (true) {
+            $icon instanceof BackedEnum => $icon->value,
+            $icon instanceof UnitEnum => $icon->name,
+            default => $icon
+        };
 
         return $this;
-    }
-
-    /**
-     * Define the icon.
-     *
-     * @return string|\Honed\Core\Contracts\Icon|(\Closure(...mixed):string|\Honed\Core\Contracts\Icon)|null
-     */
-    public function defineIcon()
-    {
-        return null;
     }
 
     /**
@@ -47,13 +40,7 @@ trait HasIcon
      */
     public function getIcon($parameters = [], $typed = [])
     {
-        $icon = $this->icon ??= $this->defineIcon();
-
-        if ($icon instanceof HasIconContract) {
-            return $icon->icon();
-        }
-
-        return $this->evaluate($icon, $parameters, $typed);
+        return $this->evaluate($this->icon, $parameters, $typed);
     }
 
     /**
@@ -63,6 +50,6 @@ trait HasIcon
      */
     public function hasIcon()
     {
-        return isset($this->icon) || filled($this->defineIcon());
+        return isset($this->icon);
     }
 }

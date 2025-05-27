@@ -1,24 +1,23 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Honed\Core\Concerns;
+
+use Closure;
+use Honed\Core\Contracts\WithAllowance;
 
 trait Allowable
 {
     /**
      * The allow condition.
      *
-     * @default true
-     *
-     * @var \Closure(...mixed):bool|bool
+     * @var (\Closure(...mixed):bool)|bool|null
      */
-    protected $allow = true;
+    protected $allow;
 
     /**
      * Set the allow condition.
      *
-     * @param  \Closure(...mixed):bool|bool  $allow
+     * @param  (\Closure(...mixed):bool)|bool|null  $allow
      * @return $this
      */
     public function allow($allow)
@@ -29,13 +28,21 @@ trait Allowable
     }
 
     /**
-     * Define the allow condition.
+     * Get the allow condition callback.
      *
-     * @return \Closure(...mixed):bool|bool|null
+     * @return (\Closure(...mixed):bool)|bool
      */
-    public function defineAllow()
+    public function getAllowCallback()
     {
-        return null;
+        if (isset($this->allow)) {
+            return $this->allow;
+        }
+
+        if ($this instanceof WithAllowance) {
+            return $this->allow = Closure::fromCallable([$this, 'allowUsing']);
+        }
+
+        return true;
     }
 
     /**
@@ -47,7 +54,7 @@ trait Allowable
      */
     public function isAllowed($parameters = [], $typed = [])
     {
-        $allow = $this->allow ??= $this->defineAllow();
+        $allow = $this->getAllowCallback();
 
         return (bool) $this->evaluate($allow, $parameters, $typed);
     }

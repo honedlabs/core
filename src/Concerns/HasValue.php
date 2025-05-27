@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Honed\Core\Concerns;
 
 trait HasValue
@@ -27,23 +25,13 @@ trait HasValue
     }
 
     /**
-     * Define the value.
-     *
-     * @return mixed
-     */
-    public function defineValue()
-    {
-        return null;
-    }
-
-    /**
      * Get the value.
      *
      * @return mixed
      */
     public function getValue()
     {
-        return $this->value ??= $this->defineValue();
+        return $this->value;
     }
 
     /**

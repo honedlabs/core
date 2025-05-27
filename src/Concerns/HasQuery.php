@@ -1,31 +1,29 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Honed\Core\Concerns;
 
+use Closure;
+use Honed\Core\Contracts\WithQuery;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
- * @template TModel of \Illuminate\Database\Eloquent\Model
- * @template TBuilder of \Illuminate\Database\Eloquent\Builder<TModel>
- *
- * @method static \Closure|null defineQuery()
+ * @template TModel of \Illuminate\Database\Eloquent\Model = \Illuminate\Database\Eloquent\Model
+ * @template TBuilder of \Illuminate\Database\Eloquent\Builder<TModel> = \Illuminate\Database\Eloquent\Builder<TModel>
  */
 trait HasQuery
 {
     /**
      * The query closure to modify the Eloquent builder.
      *
-     * @var \Closure|null
+     * @var (\Closure(TBuilder, ...mixed):TBuilder|void)|null
      */
     protected $query;
 
     /**
      * Set the query closure.
      *
-     * @param  \Closure|null  $query
+     * @param  (\Closure(TBuilder, ...mixed):TBuilder)|void|null  $query
      * @return $this
      */
     public function query($query)
@@ -36,23 +34,21 @@ trait HasQuery
     }
 
     /**
-     * Define the query closure.
-     *
-     * @return \Closure|null
-     */
-    public function defineQuery()
-    {
-        return null;
-    }
-
-    /**
      * Get the query closure.
      *
-     * @return \Closure|null
+     * @return (\Closure(TBuilder, ...mixed):TBuilder)|void|null
      */
     public function getQuery()
     {
-        return $this->query ??= $this->defineQuery();
+        if (isset($this->query)) {
+            return $this->query;
+        }
+
+        if ($this instanceof WithQuery) {
+            return $this->query = Closure::fromCallable([$this, 'queryUsing']);
+        }
+
+        return null;
     }
 
     /**
@@ -87,9 +83,9 @@ trait HasQuery
     /**
      * Rebind the query closure with the bindings injected to closure arguments.
      *
-     * @param  \Closure  $closure
+     * @param  (\Closure(TBuilder, ...mixed):TBuilder)|void  $closure
      * @param  array<string, mixed>  $bindings
-     * @return \Closure(TBuilder):void
+     * @return (\Closure(TBuilder, ...mixed):TBuilder)|void
      */
     public function rebindQuery($closure, $bindings = [])
     {

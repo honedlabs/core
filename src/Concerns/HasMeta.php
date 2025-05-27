@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Honed\Core\Concerns;
 
 trait HasMeta
@@ -27,23 +25,13 @@ trait HasMeta
     }
 
     /**
-     * Define the meta data.
-     *
-     * @return array<string,mixed>
-     */
-    public function defineMeta()
-    {
-        return [];
-    }
-
-    /**
      * Get the meta.
      *
      * @return array<string,mixed>
      */
     public function getMeta()
     {
-        return $this->meta ??= $this->defineMeta();
+        return $this->meta;
     }
 
     /**

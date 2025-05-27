@@ -1,15 +1,11 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Honed\Core\Concerns;
 
 trait IsActive
 {
     /**
      * Whether it is active.
-     *
-     * @default false
      *
      * @var bool
      */
@@ -24,6 +20,13 @@ trait IsActive
     public function active($active = true)
     {
         $this->active = $active;
+
+        return $this;
+    }
+
+    public function inactive($inactive = true)
+    {
+        $this->active = ! $inactive;
 
         return $this;
     }
