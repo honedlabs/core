@@ -10,4 +10,3 @@ test('attempt', function () {
         ->{0}->toBeNull()
         ->{1}->toBeInstanceOf(Exception::class);
 });
-
