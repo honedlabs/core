@@ -1,11 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 use Honed\Core\Concerns\HasResource;
 use Honed\Core\Exceptions\InvalidResourceException;
 use Honed\Core\Exceptions\ResourceNotSetException;
-use Honed\Core\Tests\Stubs\Product;
-use Honed\Core\Tests\Stubs\Status;
 use Illuminate\Database\Eloquent\Builder;
+use Workbench\App\Enums\Status;
 use Workbench\App\Models\User;
 
 beforeEach(function () {
@@ -45,10 +46,10 @@ it('requires builder', function () {
 })->throws(ResourceNotSetException::class);
 
 it('converts to builder', function () {
-    expect($this->test->throughBuilder(Product::query()))
+    expect($this->test->throughBuilder(User::query()))
         ->toBeInstanceOf(Builder::class);
 
-    expect($this->test->throughBuilder(Product::class))
+    expect($this->test->throughBuilder(User::class))
         ->toBeInstanceOf(Builder::class);
 
     expect($this->test->throughBuilder(User::factory()->create()))

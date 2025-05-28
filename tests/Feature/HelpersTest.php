@@ -1,7 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
+use Workbench\App\Enums\Status;
+
 test('enum_value', function () {
     expect(enum_value('value'))->toBe('value');
+
+    expect(enum_value(Status::Available))->toBe(0);
 });
 
 test('attempt', function () {

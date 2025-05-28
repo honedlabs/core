@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Honed\Core\Concerns;
 
 use const FILTER_VALIDATE_BOOLEAN;
@@ -194,6 +196,7 @@ trait InterpretsRequest
 
         $value = $request->query($key, null);
 
+        // @phpstan-ignore-next-line
         if (is_array($value)) {
             return Arr::first(Arr::flatten($value));
         }
