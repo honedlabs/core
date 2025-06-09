@@ -42,7 +42,6 @@ trait Evaluable
             return $value instanceof BackedEnum ? $value->value : $value;
         }
 
-
         $dependencies = [];
 
         foreach ((new ReflectionFunction($value))->getParameters() as $parameter) {
