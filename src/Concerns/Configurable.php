@@ -14,7 +14,7 @@ trait Configurable
     /**
      * The configuration callback for the instance.
      *
-     * @var (Closure(\Honed\Core\Primitive):\Honed\Core\Primitive|void)
+     * @var (Closure(static):static|void)|null
      */
     protected static $configuration;
 
@@ -23,7 +23,7 @@ trait Configurable
      *
      * @return void
      */
-    public function setUp()
+    protected function setUp()
     {
         $this->configure();
     }
@@ -31,7 +31,7 @@ trait Configurable
     /**
      * Set the configuration for the instance.
      *
-     * @param  (Closure(\Honed\Core\Primitive):\Honed\Core\Primitive|void)  $configuration
+     * @param  (Closure(static):static|void)  $configuration
      * @return void
      */
     public static function configureUsing($configuration)
@@ -44,10 +44,12 @@ trait Configurable
      *
      * @return void
      */
-    public function configure()
+    protected function configure()
     {
-        if (static::$configuration) {
-            (static::$configuration)($this);
+        if (isset(static::$configuration)) {
+            $configuration = static::$configuration;
+
+            $configuration($this); // @phpstan-ignore callable.nonCallable
         }
     }
 }

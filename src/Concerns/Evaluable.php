@@ -25,12 +25,10 @@ trait Evaluable
     /**
      * Evaluate an expression with correct dependencies.
      *
-     * @template T
-     *
-     * @param  T|Closure(mixed...):T|object  $value
+     * @param  mixed  $value
      * @param  array<string, mixed>  $named
      * @param  array<class-string, mixed>  $typed
-     * @return T
+     * @return mixed
      */
     public function evaluate($value, $named = [], $typed = [])
     {
