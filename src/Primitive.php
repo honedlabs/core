@@ -5,13 +5,17 @@ declare(strict_types=1);
 namespace Honed\Core;
 
 use BadMethodCallException;
+use Honed\Core\Concerns\CanDeferLoading;
 use Honed\Core\Concerns\Configurable;
 use Honed\Core\Concerns\Evaluable;
 use Honed\Core\Contracts\NullsAsUndefined;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\Tappable;
+use JsonException;
 use JsonSerializable;
 
 use function array_filter;
@@ -22,8 +26,9 @@ use function array_filter;
  *
  * @implements Arrayable<TKey,TValue>
  */
-abstract class Primitive implements Arrayable, JsonSerializable
+abstract class Primitive implements Arrayable, Jsonable, JsonSerializable
 {
+    use CanDeferLoading;
     use Conditionable;
     use Configurable;
     use Evaluable;
@@ -37,7 +42,7 @@ abstract class Primitive implements Arrayable, JsonSerializable
      */
     public function __construct()
     {
-        $this->setUp();
+        $this->configure();
     }
 
     /**
@@ -55,19 +60,68 @@ abstract class Primitive implements Arrayable, JsonSerializable
     }
 
     /**
+     * Get the representation of the instance.
+     *
+     * @return array<TKey,TValue>
+     */
+    abstract protected function representation(): array;
+
+    /**
      * Serialize the instance
      *
      * @return array<string,mixed>
      */
     public function jsonSerialize(): mixed
     {
+        return $this->toArray();
+    }
+
+    /**
+     * Get the instance as an array.
+     *
+     * @return array<TKey, TValue>
+     */
+    public function toArray()
+    {
         if ($this instanceof NullsAsUndefined) {
-            return array_filter(
-                $this->toArray(),
-                static fn ($value) => ! is_null($value)
+            return $this->undefine($this->representation());
+        }
+
+        return $this->representation();
+    }
+
+    /**
+     * Convert the primitive instance to JSON.
+     *
+     * @param  int  $options
+     * @return string
+     *
+     * @throws JsonEncodingException
+     */
+    public function toJson($options = 0)
+    {
+        try {
+            $json = json_encode($this->jsonSerialize(), $options | JSON_THROW_ON_ERROR);
+        } catch (JsonException $e) {
+            throw new JsonEncodingException(
+                'Error encoding primitive ['.get_class($this).'] to JSON: '.$e->getMessage()
             );
         }
 
-        return $this->toArray();
+        return $json;
+    }
+
+    /**
+     * Set null values to undefined by filtering the key (non recursive).
+     *
+     * @param  array<TKey,TValue>  $value
+     * @return array<TKey,TValue>
+     */
+    protected function undefine($value)
+    {
+        return array_filter(
+            $value,
+            static fn ($value) => ! is_null($value)
+        );
     }
 }
