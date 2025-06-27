@@ -16,12 +16,12 @@ trait Allowable
     /**
      * Set the allow condition.
      *
-     * @param  (\Closure(...mixed):bool)|bool  $allow
+     * @param  (\Closure(...mixed):bool)|bool  $value
      * @return $this
      */
-    public function allow($allow)
+    public function allow($value)
     {
-        $this->allow = $allow;
+        $this->allow = $value;
 
         return $this;
     }
@@ -31,7 +31,7 @@ trait Allowable
      *
      * @return (\Closure(...mixed):bool)|bool
      */
-    public function getAllowCallback()
+    public function allowCallback()
     {
         return $this->allow;
     }
@@ -45,8 +45,6 @@ trait Allowable
      */
     public function isAllowed($parameters = [], $typed = [])
     {
-        $allow = $this->getAllowCallback();
-
-        return (bool) $this->evaluate($allow, $parameters, $typed);
+        return (bool) $this->evaluate($this->allowCallback(), $parameters, $typed);
     }
 }

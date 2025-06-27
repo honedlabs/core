@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Honed\Core\Concerns;
 
-trait HasAlias
+trait CanHaveAlias
 {
     /**
      * The alias to use to hide the underlying value.
@@ -44,15 +44,5 @@ trait HasAlias
     public function getAlias()
     {
         return $this->alias;
-    }
-
-    /**
-     * Determine if an alias is set.
-     *
-     * @return bool
-     */
-    public function hasAlias()
-    {
-        return isset($this->alias);
     }
 }
