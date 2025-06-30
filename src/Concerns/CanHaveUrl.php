@@ -22,23 +22,25 @@ trait CanHaveUrl
      *
      * @var string|\Closure(...mixed):string|null
      */
-    protected $url;
+    protected string|Closure|null $url = null;
 
     /**
      * The method for visiting the URL.
-     *
-     * @var string
      */
-    protected $method = Request::METHOD_GET;
+    protected string $method = Request::METHOD_GET;
+
+    /**
+     * The target for the URL
+     */
+    protected ?string $target = null;
 
     /**
      * Set the url to visit.
      *
      * @param  string|(\Closure(...mixed):string)|null  $value
-     * @param  mixed  $parameters
      * @return $this
      */
-    public function url($value, $parameters = [])
+    public function url(string|Closure|null $value, mixed $parameters = []): static
     {
         $this->url = match (true) {
             ! $value => null,
@@ -56,19 +58,16 @@ trait CanHaveUrl
      *
      * @param  array<string,mixed>  $named
      * @param  array<class-string,mixed>  $typed
-     * @return string|null
      */
-    public function getUrl($named = [], $typed = [])
+    public function getUrl(array $named = [], array $typed = []): ?string
     {
         return $this->evaluate($this->url, $named, $typed);
     }
 
     /**
      * Determine if there is a URL set.
-     *
-     * @return bool
      */
-    public function hasUrl()
+    public function hasUrl(): bool
     {
         return isset($this->url);
     }
@@ -76,12 +75,11 @@ trait CanHaveUrl
     /**
      * Set the HTTP method for the route.
      *
-     * @param  string|null  $method
      * @return $this
      *
      * @throws InvalidMethodException
      */
-    public function method($method)
+    public function method(?string $method): static
     {
         $method = mb_strtoupper($method ?? '');
 
@@ -101,7 +99,7 @@ trait CanHaveUrl
      *
      * @return $this
      */
-    public function post()
+    public function post(): static
     {
         return $this->method(Request::METHOD_POST);
     }
@@ -111,7 +109,7 @@ trait CanHaveUrl
      *
      * @return $this
      */
-    public function patch()
+    public function patch(): static
     {
         return $this->method(Request::METHOD_PATCH);
     }
@@ -121,7 +119,7 @@ trait CanHaveUrl
      *
      * @return $this
      */
-    public function put()
+    public function put(): static
     {
         return $this->method(Request::METHOD_PUT);
     }
@@ -131,19 +129,47 @@ trait CanHaveUrl
      *
      * @return $this
      */
-    public function delete()
+    public function delete(): static
     {
         return $this->method(Request::METHOD_DELETE);
     }
 
     /**
      * Get the HTTP method for the route.
-     *
-     * @return string
      */
-    public function getMethod()
+    public function getMethod(): string
     {
         return $this->method;
+    }
+
+    /**
+     * Set the target for the URL.
+     *
+     * @return $this
+     */
+    public function target(?string $target): static
+    {
+        $this->target = $target;
+
+        return $this;
+    }
+
+    /**
+     * Open the URL in a new tab.
+     *
+     * @return $this
+     */
+    public function openUrlInNewTab(): static
+    {
+        return $this->target('_blank');
+    }
+
+    /**
+     * Get the target for the URL.
+     */
+    public function getTarget(): ?string
+    {
+        return $this->target;
     }
 
     /**
@@ -151,40 +177,35 @@ trait CanHaveUrl
      *
      * @param  array<string,mixed>  $parameters
      * @param  array<class-string,mixed>  $typed
-     * @return array{url:string|null,method:string}|null
+     * @return array{href:string|null,method:string,target:string|null}
      */
-    public function urlToArray($parameters = [], $typed = [])
+    public function urlToArray(array $parameters = [], array $typed = []): array
     {
         $url = $this->getUrl($parameters, $typed);
 
         if (! $url) {
-            return null;
+            return [];
         }
 
         return [
-            'url' => $url,
+            'href' => $url,
             'method' => $this->getMethod(),
+            'target' => $this->getTarget(),
         ];
     }
 
     /**
      * Determine if the parameters are a route bound.
-     *
-     * @param  mixed  $parameters
-     * @return bool
      */
-    protected function implicitRoute($parameters)
+    protected function implicitRoute(mixed $parameters): bool
     {
         return is_string($parameters) && Str::is('{*}', $parameters);
     }
 
     /**
      * Determine if the HTTP method is invalid.
-     *
-     * @param  string  $method
-     * @return bool
      */
-    protected function invalidMethod($method)
+    protected function invalidMethod(string $method): bool
     {
         return ! in_array($method, [
             Request::METHOD_GET,
