@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Workbench\App\Classes;
 
 use Honed\Core\Concerns\CanQuery;
+use Honed\Core\Concerns\Encodable;
 use Honed\Core\Concerns\HasLifecycleHooks;
 use Honed\Core\Concerns\HasMeta;
 use Honed\Core\Concerns\HasName;
@@ -20,6 +21,7 @@ use Workbench\App\Pipes\SetType;
 class Component extends Primitive implements HooksIntoLifecycle
 {
     use CanQuery;
+    use Encodable;
     use HasLifecycleHooks;
     use HasMeta;
     use HasName;
