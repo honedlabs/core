@@ -7,11 +7,24 @@ namespace Honed\Core\Concerns;
 trait Definable
 {
     /**
+     * Whether the instance has been defined.
+     *
+     * @var bool
+     */
+    protected $defined = false;
+
+    /**
      * Call the definition.
+     *
+     * @internal
      */
     public function define(): void
     {
-        $this->definition();
+        if (! $this->defined) {
+            $this->definition();
+
+            $this->defined = true;
+        }
     }
 
     /**
