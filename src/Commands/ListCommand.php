@@ -106,7 +106,7 @@ abstract class ListCommand extends Command
      */
     protected function classFromFile(SplFileInfo $file): string
     {
-        $class = mb_trim(Str::replaceFirst($this->basePath(), '', $file->getRealPath()), DIRECTORY_SEPARATOR);
+        $class = trim(Str::replaceFirst($this->basePath(), '', $file->getRealPath()), DIRECTORY_SEPARATOR);
 
         return ucfirst(Str::camel(str_replace(
             [DIRECTORY_SEPARATOR, ucfirst(basename(app()->path())).'\\'],
@@ -196,6 +196,7 @@ abstract class ListCommand extends Command
      */
     protected function getTraits(string $class): array
     {
+        /** @var array<int, class-string> */
         return class_uses_recursive($class);
     }
 
