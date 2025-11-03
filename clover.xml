@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1761959451">
-  <project timestamp="1761959451" name="Clover Coverage">
+<coverage generated="1762208399">
+  <project timestamp="1762208399" name="Clover Coverage">
     <package name="Honed\Core\Commands">
       <file name="/home/runner/work/core/core/src/Commands/ListCommand.php">
         <class name="Honed\Core\Commands\ListCommand" namespace="Honed\Core\Commands">
